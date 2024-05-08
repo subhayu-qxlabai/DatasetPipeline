@@ -9,20 +9,28 @@ from .base import BaseLoader, BaseConfig
 
 class HFLoaderConfig(BaseConfig):
     token: str | None = None
-    save: bool = True
     merge: bool = True
     split: str | None = "train"
-    directory: Path | str = "dataset"
+    directory: Path | str | None = "dataset"
     
     @model_validator(mode="after")
     def validate_save_dir(self):
+        if self.directory is None:
+            return self
         self.directory = Path(self.directory)
         self.directory.mkdir(parents=True, exist_ok=True)
         return self
     
     @computed_field
     @property
-    def save_path(self) -> Path:
+    def save(self) -> bool:
+        return bool(self.directory)
+    
+    @computed_field
+    @property
+    def save_path(self) -> Path | None:
+        if self.directory is None:
+            return None
         return self.directory / self.path
 
 
@@ -32,9 +40,10 @@ class HFLoader(BaseLoader):
         self.config: HFLoaderConfig
         
     def load_or_download(self):
-        if self.config.save_path.exists():
+        path = self.config.save_path
+        if path and path.exists():
             try:
-                return Dataset.load_from_disk(self.config.save_path.as_posix())
+                return Dataset.load_from_disk(path.as_posix())
             except Exception:
                 pass
         return load_dataset(
