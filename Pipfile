@@ -12,6 +12,7 @@ retry = "*"
 fuzzywuzzy = "*"
 pydantic = "*"
 typer = "*"
+python-levenshtein = "*"
 
 [dev-packages]
 ipykernel = "*"
