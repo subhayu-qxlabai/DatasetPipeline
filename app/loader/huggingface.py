@@ -41,18 +41,26 @@ class HFLoader(BaseLoader):
         
     def load_or_download(self):
         path = self.config.save_path
+        dataset = None
         if path and path.exists():
-            try:
-                return Dataset.load_from_disk(path.as_posix())
-            except Exception:
-                pass
+            if path.is_dir():
+                try:
+                    dataset = Dataset.load_from_disk(path.as_posix())
+                except Exception:
+                    pass
+                try:
+                    dataset = DatasetDict.load_from_disk(path.as_posix())
+                except Exception:
+                    pass
+        if dataset is not None:
+            return dataset
         return load_dataset(
             path=self.config.path,
             token=self.config.token
         )
     
     def save(self, dataset: Dataset):
-        if self.config.save:
+        if self.config.save and not self.config.save_path.exists():
             dataset.save_to_disk(self.config.save_path.as_posix())
 
     def load(self) -> Dataset | DatasetDict:
