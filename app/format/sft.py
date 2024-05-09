@@ -18,6 +18,7 @@ PATTERN_ROLE_MAP = {
     "^prompt.*": Role.USER,
     "^instruction.*": Role.USER,
     "message_1": Role.USER,
+    "source.*": Role.USER,
     
     "response.*": Role.ASSISTANT,
     "output.*": Role.ASSISTANT,
@@ -27,6 +28,7 @@ PATTERN_ROLE_MAP = {
     "gpt.*": Role.ASSISTANT,
     "support.*": Role.ASSISTANT,
     "message_2": Role.ASSISTANT,
+    "target.*": Role.ASSISTANT,
     
     "system.*": Role.SYSTEM,
     "instruction.*": Role.SYSTEM,
