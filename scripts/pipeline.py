@@ -3,7 +3,7 @@ from pathlib import Path
 import typer
 import rich
 
-from app import Pipeline, Job
+from app import Pipeline, Job, JobConfig
 from app.sample_job import config as sample_job_config
 
 app = typer.Typer(name="pipeline", no_args_is_help=True)
@@ -14,11 +14,19 @@ def load_pipeline_from_path(path: str):
     if path.is_dir():
         pipeline = Pipeline.from_dir(path)
     elif path.is_file():
-        pipeline = Pipeline.from_file(path)
+        try:
+            pipeline = Pipeline.from_file(path)
+        except Exception:
+            pipeline = Pipeline(jobs=[])
+        try:
+            configs = [JobConfig.from_file(path)]
+        except Exception:
+            configs = []
+        
+        pipeline.jobs = pipeline.jobs + configs
     else:
         raise ValueError("Invalid path. Must be a directory or a file.")
     return pipeline
-
 
 @app.command(name="list", help="List all jobs in the pipeline.")
 def list_jobs(
