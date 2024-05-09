@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import ClassVar
 from datasets import Dataset
 
 from .models import BaseModel
@@ -19,7 +20,7 @@ class JobConfig(BaseModel):
 class Job(BaseModel):
     config: JobConfig
     
-    completed = False
+    completed: ClassVar[bool] = False
     
     def load(self):
         loader = Loader(self.config.loader)
