@@ -1,5 +1,4 @@
 from pathlib import Path
-from typing import ClassVar
 from datasets import Dataset
 
 from .models import BaseModel
@@ -19,8 +18,6 @@ class JobConfig(BaseModel):
 
 class Job(BaseModel):
     config: JobConfig
-    
-    completed: ClassVar[bool] = False
     
     def load(self):
         loader = Loader(self.config.loader)
@@ -60,7 +57,6 @@ class Job(BaseModel):
         data: list[tuple[str, Dataset]] = [(name, dst) for _, (name, dst) in data]
         if self.config.saver is not None:
             data = run_parallel_exec(self.save, data)
-        self.completed = True
         return data
 
     def __call__(self) -> list[Path | Dataset]:

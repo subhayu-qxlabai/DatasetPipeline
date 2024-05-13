@@ -15,7 +15,7 @@ class Pipeline(BaseModel):
         return len(self.jobs)
     
     def run(self):
-        return [pipeline.run() for pipeline in self.get_jobs()]
+        return [job.run() for job in self.get_jobs()]
     
     @classmethod
     def from_dir(cls, directory: Path | str):
