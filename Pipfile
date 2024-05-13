@@ -13,6 +13,7 @@ fuzzywuzzy = "*"
 pydantic = "*"
 typer = "*"
 python-levenshtein = "*"
+loguru = "*"
 
 [dev-packages]
 ipykernel = "*"
