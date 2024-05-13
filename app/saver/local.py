@@ -63,7 +63,7 @@ class LocalSaverConfig(LocalDirSaverConfig):
         suffix = f".{self.filetype.value}"
         if self.filename.endswith(suffix):
             return Path(self.directory) / Path(self.filename)
-        return Path(self.directory) / Path(self.filename).with_suffix(suffix).name
+        return Path(self.directory) / Path(self.filename).with_suffix(suffix)
 
 
 class LocalSaver(BaseSaver):
