@@ -49,12 +49,11 @@ def run_pipeline(
 def sample(
     file: str = typer.Argument(None, help="Path to dump the config to. Can have a .json or .yaml extension."),
 ):
-    job = Job(config=sample_job_config)
     if file is None:
         rich.print("File path not specified. Printing to stdout.", end="\n\n")
-        rich.print(job, end="\n\n")
+        rich.print(sample_job_config, end="\n\n")
     else:
         if Path(file).exists():
             if not typer.confirm(f"File {file} already exists. Overwrite?", abort=True):
                 return
-        job.to_file(file)
+        sample_job_config.to_file(file)
