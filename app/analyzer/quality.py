@@ -1,4 +1,5 @@
 import json
+from warnings import warn
 
 from retry import retry
 from datasets import Dataset
@@ -38,6 +39,7 @@ TEXT_QUALITY_EXAMPLE_MESSAGES = Messages(
 
 class QualityConfig(BaseConfig):
     column_name: str = "messages"
+    categories: list[str] | None = None
     example_messages: Messages = TEXT_QUALITY_EXAMPLE_MESSAGES
     
     @model_validator(mode="after")
@@ -76,6 +78,10 @@ class QualityAnalyzer(BaseAnalyzer):
         return TextQuality.from_json(response)
     
     def _analyze(self) -> Dataset:
+        if not all(isinstance(x, str) for x in self.dataset[self.config.column_name]):
+            warn(f"Column {self.config.column_name!r} is not a string column. Skipping {self.name!r} analysis.")
+            return self.dataset
         texts: set[str] = set(self.dataset[self.config.column_name])
         text_qualities: dict[str, TextQuality] = dict(run_parallel_exec(self.get_text_quality, texts))
+        text_qualities = {k: v.fix_category(self.config.categories) for k, v in text_qualities.items()}
         return self.dataset.map(lambda x: text_qualities[x[self.config.column_name]].to_dict())
