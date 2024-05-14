@@ -1,11 +1,11 @@
 from abc import ABC, abstractmethod
 
-from datasets import Dataset
+from datasets import Dataset, DatasetDict
 from ..models.base import BaseModel
 
 
 class BaseConfig(BaseModel):
-    path: str
+    pass
 
 class BaseLoader(ABC):
     def __init__(self, config: BaseConfig):
@@ -21,9 +21,9 @@ class BaseLoader(ABC):
         self.config = config
     
     @abstractmethod
-    def load(self) -> Dataset:
+    def load(self) -> Dataset | DatasetDict:
         """
-        Method that loads a Dataset.
+        Method that loads a Dataset or DatasetDict.
 
         :return: A Dataset object.
         :rtype: Dataset

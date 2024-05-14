@@ -8,8 +8,10 @@ from .base import BaseLoader, BaseConfig
 
 
 class HFLoaderConfig(BaseConfig):
+    path: str
+    name: str | None = None
     token: str | None = None
-    merge: bool = True
+    take_rows: int | None = None
     split: str | None = "train"
     directory: Path | str | None = "dataset"
     
@@ -38,8 +40,8 @@ class HFLoader(BaseLoader):
     def __init__(self, config: HFLoaderConfig):
         super().__init__(config)
         self.config: HFLoaderConfig
-        
-    def load_or_download(self):
+
+    def load_or_download(self) -> Dataset | DatasetDict:
         path = self.config.save_path
         dataset = None
         if path and path.exists():
@@ -56,24 +58,27 @@ class HFLoader(BaseLoader):
             return dataset
         return load_dataset(
             path=self.config.path,
-            token=self.config.token
+            name=self.config.name,
+            token=self.config.token,
+            split=self.config.split,
         )
-    
+
     def save(self, dataset: Dataset):
         if self.config.save and not self.config.save_path.exists():
             dataset.save_to_disk(self.config.save_path.as_posix())
 
-    def load(self) -> Dataset | DatasetDict:
+    def load(self) -> DatasetDict:
         dsts = self.load_or_download()
         self.save(dsts)
-        
-        if self.config.merge:
-            if isinstance(dsts, DatasetDict):
-                dsts = Dataset.from_list(list(chain(*[d.to_list() for d in dsts.values()])))
-            return dsts
-        
-        if isinstance(dsts, DatasetDict) and self.config.split in dsts:
-            return dsts.get(self.config.split)
-
-        return dsts
-    
+        path_datasets_map = [
+            (path, dst if isinstance(dst, DatasetDict) else {0: dst})
+            for path, dst in [(self.config.path, dsts)]
+        ]
+        path_datasets_map = {
+            (f"{path}-{split}" if isinstance(split, str) else path): (
+                dst.take(self.config.take_rows) if self.config.take_rows else dst
+            )
+            for path, ddict in path_datasets_map
+            for split, dst in ddict.items()
+        }
+        return DatasetDict(path_datasets_map)

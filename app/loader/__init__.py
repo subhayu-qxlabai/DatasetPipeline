@@ -19,18 +19,11 @@ class Loader:
             *[HFLoader(loader) for loader in self.config.huggingface]
         ]
 
-    def load(self) -> dict[str, Dataset]:
-        path_datasets_map = [
-            (loader.config.path, loader.load())
-            for loader in self.loaders
-        ]
-        path_datasets_map = [
-            (path, dst if isinstance(dst, DatasetDict) else {0: dst})
-            for path, dst in path_datasets_map
-        ]
-        return {
-            (f"{path}-{split}" if isinstance(split, str) else path): dst
-            for path, ddict in path_datasets_map
-            for split, dst in ddict.items()
-        }
+    def load(self) -> DatasetDict:
+        path_dataset_map = {}
+        for loader in self.loaders:
+            dst = loader.load()
+            path_dataset_map.update(dst if isinstance(dst, DatasetDict) else DatasetDict({0: dst}))
+        
+        return DatasetDict(path_dataset_map)
     
