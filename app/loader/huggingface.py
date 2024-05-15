@@ -1,4 +1,3 @@
-from itertools import chain
 from pathlib import Path
 
 from pydantic import computed_field, model_validator

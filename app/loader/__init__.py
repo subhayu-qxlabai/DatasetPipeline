@@ -1,13 +1,16 @@
 from dataclasses import dataclass
 
 from datasets import Dataset, DatasetDict
+from pydantic import Field
 
 from .base import BaseLoader, BaseConfig, BaseModel
 from .huggingface import HFLoader, HFLoaderConfig
+from .local_file import LocalFileLoader, LocalFileLoaderConfig
 
 
 class LoaderConfig(BaseModel):
-    huggingface: list[HFLoaderConfig]
+    huggingface: list[HFLoaderConfig] = Field(default_factory=list)
+    local_file: list[LocalFileLoaderConfig] = Field(default_factory=list)
     
 
 @dataclass
@@ -15,8 +18,9 @@ class Loader:
     config: LoaderConfig
     
     def __post_init__(self):
-        self.loaders = [
-            *[HFLoader(loader) for loader in self.config.huggingface]
+        self.loaders: list[BaseLoader] = [
+            *[HFLoader(loader) for loader in self.config.huggingface],
+            *[LocalFileLoader(loader) for loader in self.config.local_file],
         ]
 
     def load(self) -> DatasetDict:
