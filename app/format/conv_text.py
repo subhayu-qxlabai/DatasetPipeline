@@ -10,14 +10,16 @@ from ..constants import MessageRole as Role, MessageField as Field
 
 
 class ConvTextConfig(BaseConfig):
-    pass
+    conv_col: str | None = None
+    conv_template: str | None = None
+
 
 class ConversationalTextFormat(BaseFormat):
     """Converts a dataset having columns with conversation between between 2-3 entities in text format to a standard conversational format having system, user and assistant."""
     def __init__(self, dataset: Dataset, config: ConvTextConfig = ConvTextConfig()):
         super().__init__(dataset, config)
         self.config: ConvTextConfig
-        warn(f"The {self.__class__.__name__!r} class is experimental, doesn't always work as expected and can be slow with about 10-20s of execution time.", UserWarning)
+        # warn(f"The {self.__class__.__name__!r} class is experimental, doesn't always work as expected and can be slow with about 10-20s of execution time.", UserWarning)
         self._is_this_format = False
 
     @property
@@ -124,16 +126,26 @@ class ConversationalTextFormat(BaseFormat):
                     "content": text
                 },
             ],
-            n=3,
+            n=5,
         )
         response: list[str] = [x["message"]["content"] for x in response["choices"]]
         return response
 
     def _get_col_template_map(self):
-        conv_col_keys = self._get_text_conv_cols_openai()
+        conv_col_keys = (
+            [self.config.conv_col] if self.config.conv_col 
+            else self._get_text_conv_cols_openai()
+        )
         col_template_map = run_parallel_exec(
-            lambda x: self._get_template_openai(x[1], x[0]), 
-            [(k, v) for k, v in self.dict_repr.items() if isinstance(v, str) and k in conv_col_keys]
+            lambda x: (
+                [self.config.conv_template] 
+                if self.config.conv_template and self.config.conv_col in conv_col_keys 
+                else self._get_template_openai(x[1], x[0])
+            ), 
+            [
+                (k, v) for k, v in self.dict_repr.items() 
+                if isinstance(v, str) and k in conv_col_keys
+            ]
         )
         col_template_map = {
             col: [
