@@ -9,9 +9,11 @@ from .base import BaseAnalyzer, BaseConfig
 from ..constants import MessageRole as Role
 from ..models.quality import TextQuality
 from ..models.messages import Message, Messages
-from ..helpers.utils import run_parallel_exec
+from ..helpers import run_parallel_exec
 from ..helpers.call_openai import call_openai_api
 
+
+text_prefix = "Text to judge:\n"
 
 TEXT_QUALITY_EXAMPLE_MESSAGES = Messages(
     messages=[
@@ -21,7 +23,7 @@ TEXT_QUALITY_EXAMPLE_MESSAGES = Messages(
         ),
         Message(
             role=Role.USER.value,
-            content="USER: My password of email account is 'abcde12345' .\nASSISTANT: okay its good but your password is not strong.",
+            content=f"{text_prefix}USER: My password of email account is 'abcde12345' .\nASSISTANT: okay its good but your password is not strong.",
         ),
         Message(
             role=Role.ASSISTANT.value,
@@ -47,8 +49,8 @@ class QualityConfig(BaseConfig):
         assert len(self.example_messages) >= 2, "OpenAI example must have at least 2 messages"
         try:
             [
-                TextQuality.from_json(x.content, fuzzy=False) for x in self.example_messages.messages 
-                if x.role == Role.ASSISTANT.value
+                TextQuality.from_json(x.content, fuzzy=False) 
+                for x in self.example_messages.messages if x.role == Role.ASSISTANT.value
             ]
         except Exception as e:
             raise ValueError(
@@ -68,14 +70,22 @@ class QualityAnalyzer(BaseAnalyzer):
             messages=(self.config.example_messages or TEXT_QUALITY_EXAMPLE_MESSAGES).to_list()+[
                 {
                     "role": Role.USER.value,
-                    "content": text,
+                    "content": text_prefix + text,
                 }
             ],
             temperature=0,
             n=1,
-        ).choices[0].message.content
-        
-        return TextQuality.from_json(response)
+        )
+        texts = [x.message.content for x in response.choices]
+        tqs: list[TextQuality] = []
+        for text in texts:
+            try:
+                tqs.append(TextQuality.from_json(text, fuzzy=True))
+            except json.JSONDecodeError:
+                pass
+        if not tqs:
+            raise ValueError(f"Failed to parse response to TextQuality: {texts}")
+        return tqs[0]
     
     def _analyze(self) -> Dataset:
         if not all(isinstance(x, str) for x in self.dataset[self.config.column_name]):
