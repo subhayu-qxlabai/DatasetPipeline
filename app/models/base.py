@@ -6,7 +6,7 @@ from typing import Any, Literal
 from pydantic.main import IncEx
 from pydantic import BaseModel as PydanticBaseModel
 
-from ..helpers.utils import clean_json_str, find_best_match
+from ..helpers.utils import clean_json_str, clean_yaml_str, find_best_match
 
 PathLike = str | Path
 
@@ -73,7 +73,7 @@ class BaseModel(PydanticBaseModel):
         Returns:
             BaseModel: The created BaseModel object.
         """
-        return cls.from_dict(yaml.safe_load(data), fuzzy)
+        return cls.from_dict(yaml.safe_load(clean_yaml_str(data)), fuzzy)
     
     @classmethod
     def from_file(cls, path: PathLike, fuzzy=False, cutoff: float = 0.0):
