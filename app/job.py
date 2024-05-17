@@ -8,7 +8,7 @@ from .format import Format, FormatConfig
 from .dedup import Dedup, DedupConfig
 from .analyzer import Analyzer, AnalyzerConfig
 from .saver import Saver, SaverConfig
-from .helpers.utils import run_parallel_exec
+from .helpers import run_parallel_exec
 from .helpers.logger import LOGGER
 
 

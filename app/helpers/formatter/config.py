@@ -13,3 +13,17 @@ class FormatterConfig(BaseModel):
     message_role_field: str = "role"
     message_content_field: str = "content"
     separator: str = " "
+    
+    def __str__(self):
+        return (
+            self.system.template 
+            + self.separator 
+            + self.user.template 
+            + self.separator 
+            + self.assistant.template
+            + self.separator 
+            + f"{self.user.template[:4]}..."
+        )
+    
+    def __repr__(self):
+        return str(self)

@@ -7,7 +7,7 @@ from pydantic import model_validator, field_validator, computed_field
 
 from .base import BaseSaver, BaseConfig
 from ..helpers.utils import get_ts_filename
-
+from ..helpers import LOGGER
 
 class FileType(str, Enum):
     CSV = "csv"
@@ -77,5 +77,6 @@ class LocalSaver(BaseSaver):
         path = self.config.save_path
         path.parent.mkdir(exist_ok=True, parents=True)
         getattr(self.dataset, f"to_{self.config.filetype.value}")(path)
+        LOGGER.info(f"Saved dataset to {path!r}")
         return path
     

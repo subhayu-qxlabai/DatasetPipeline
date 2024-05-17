@@ -20,3 +20,6 @@ def make_logger(
         format="[<green>{time}</green> | {level} | {module} | <level>{message}</level>]",
     )
     return logger
+
+
+LOGGER = make_logger()

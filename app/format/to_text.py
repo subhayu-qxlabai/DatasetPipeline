@@ -2,6 +2,7 @@ from datasets import Dataset
 
 from .base import BaseFormat, BaseConfig
 from ..helpers.formatter import MessagesFormatter, FormatterConfig, RoleConfig
+from ..helpers import LOGGER
 
 
 class ToTextConfig(BaseConfig, FormatterConfig):
@@ -25,10 +26,11 @@ class ToTextFormat(BaseFormat):
         if not self.is_this_format:
             return self.dataset
         dicts = self.dataset.to_dict()
+        
+        LOGGER.info(f"Formatting the column(s): {', '.join(self.conv_cols)!r} to format: \n{self.config}")
         for col in self.conv_cols:
             dicts[col] = MessagesFormatter(
-                messages=dicts[col],
-                config=self.config,
+                messages=dicts[col], config=self.config,
             ).format().formatted_messages
         dataset = Dataset.from_dict(dicts)
         return dataset

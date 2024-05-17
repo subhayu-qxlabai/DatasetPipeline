@@ -148,11 +148,17 @@ def choosed_gpt4_key():
 
 # requires openai==0.28.1
 import openai
+from typing import Callable
+
 from .utils import get_openai_rate_limit_seconds
+from .logger import LOGGER
 
 
 def call_openai_api(
-    messages: list[dict[str, str]], temperature: float = 0.7, n: int = 1
+    messages: list[dict[str, str]],
+    temperature: float = 0.7,
+    n: int = 1,
+    logger: Callable[[str, str], None] = LOGGER.log,
 ):
     llm_api = choosed_gpt4_key()["api"]
     # print(f"API: {llm_api}")
@@ -171,12 +177,12 @@ def call_openai_api(
         return response
     except Exception as e:
         if "response was filtered" in str(e):
-            print("Prompt was filtered.")
+            logger("DEBUG", "Prompt was filtered.")
             return
         rate_limit_seconds = get_openai_rate_limit_seconds(str(e))
         seconds_to_sleep = rate_limit_seconds + 60
-        print(f"Got error: {e!r}")
-        print(f"Sleeping for {seconds_to_sleep} seconds...")
+        logger("DEBUG", f"Got error: {e!r}")
+        logger("INFO", f"OpenAI API rate limited, sleeping for {seconds_to_sleep} seconds...")
         sleep(seconds_to_sleep)
         return call_openai_api(messages=messages, temperature=temperature, n=n)
 

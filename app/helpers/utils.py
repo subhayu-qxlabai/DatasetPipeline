@@ -70,6 +70,7 @@ def run_parallel_exec(exec_func: Callable, iterable: Iterable, *func_args, **kwa
         **kwargs: Additional keyword arguments to customize the behavior of the function.
             - max_workers (int): The maximum number of worker threads in the thread pool executor. Default is 100.
             - quiet (bool): If True, suppresses the traceback printing for exceptions. Default is False.
+            - error_logger (Callable[[str], None]): A function to print/log any error messages. Default is `print`.
     
     Returns:
         list[tuple]: A list of tuples where each tuple contains the element from the `iterable` and the result of executing the `exec_func` function on that element.
@@ -79,6 +80,7 @@ def run_parallel_exec(exec_func: Callable, iterable: Iterable, *func_args, **kwa
         >>> run_parallel_exec(str, [1, 2, 3])
         [(1, '1'), (2, '2'), (3, '3')]
     """
+    error_logger: Callable[[str], None] = kwargs.pop("error_logger", print)
     with futures.ThreadPoolExecutor(
         max_workers=kwargs.pop("max_workers", 100)
     ) as executor:
@@ -94,7 +96,7 @@ def run_parallel_exec(exec_func: Callable, iterable: Iterable, *func_args, **kwa
                 data = future.result()
             except Exception as exc:
                 log_trace = exc if kwargs.pop("quiet", False) else get_trace(exc, 3)
-                print(f"Got error while running parallel_exec: {element}: \n{log_trace}")
+                error_logger(f"Got error while running parallel_exec: {element}: \n{log_trace}")
                 result.append((element, exc))
             else:
                 result.append((element, data))
@@ -122,6 +124,10 @@ def remove_comments(text: str) -> str:
 def clean_json_str(text: str) -> str:
     cleaned_text = remove_backticks(text)
     cleaned_text = remove_comments(cleaned_text)
+    return cleaned_text
+
+def clean_yaml_str(text: str) -> str:
+    cleaned_text = remove_backticks(text)
     return cleaned_text
 
 class Match(NamedTuple):

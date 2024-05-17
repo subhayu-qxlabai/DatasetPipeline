@@ -2,7 +2,7 @@ from typing import Any, Literal
 from functools import cached_property
 
 import pandas as pd
-from langchain.vectorstores import FAISS
+from langchain_community.vectorstores import FAISS
 from datasets import Dataset, DatasetDict
 from langchain_community.embeddings.huggingface import HuggingFaceEmbeddings
 
