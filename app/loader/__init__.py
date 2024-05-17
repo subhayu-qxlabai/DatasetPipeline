@@ -10,7 +10,7 @@ from .local_file import LocalFileLoader, LocalFileLoaderConfig
 
 class LoaderConfig(BaseModel):
     huggingface: list[HFLoaderConfig] = Field(default_factory=list)
-    local_file: list[LocalFileLoaderConfig] = Field(default_factory=list)
+    local: list[LocalFileLoaderConfig] = Field(default_factory=list)
     
 
 @dataclass
@@ -20,7 +20,7 @@ class Loader:
     def __post_init__(self):
         self.loaders: list[BaseLoader] = [
             *[HFLoader(loader) for loader in self.config.huggingface],
-            *[LocalFileLoader(loader) for loader in self.config.local_file],
+            *[LocalFileLoader(loader) for loader in self.config.local],
         ]
 
     def load(self) -> DatasetDict:

@@ -4,6 +4,7 @@ from pydantic import computed_field, model_validator
 from datasets import Dataset, DatasetDict, load_dataset
 
 from .base import BaseLoader, BaseConfig
+from ..helpers import LOGGER
 
 
 class HFLoaderConfig(BaseConfig):
@@ -54,7 +55,9 @@ class HFLoader(BaseLoader):
                 except Exception:
                     pass
         if dataset is not None:
+            LOGGER.info(f"Loaded existing dataset from {path}")
             return dataset
+        LOGGER.info(f"Downloading dataset from {self.config.path}")
         return load_dataset(
             path=self.config.path,
             name=self.config.name,
@@ -65,6 +68,7 @@ class HFLoader(BaseLoader):
     def save(self, dataset: Dataset):
         if self.config.save and not self.config.save_path.exists():
             dataset.save_to_disk(self.config.save_path.as_posix())
+            LOGGER.info(f"Saved dataset to {self.config.save_path}")
 
     def load(self) -> DatasetDict:
         dsts = self.load_or_download()
