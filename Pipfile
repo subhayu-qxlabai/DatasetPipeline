@@ -14,9 +14,13 @@ pydantic = "*"
 typer = "*"
 python-levenshtein = "*"
 loguru = "*"
+sentence-transformers = "*"
+langchain = "*"
+faiss-cpu = "*"
 
 [dev-packages]
 ipykernel = "*"
+tabulate = "*"
 
 [requires]
 python_version = "3.10"
