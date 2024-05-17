@@ -15,5 +15,6 @@ from .format import (
     OutputConfig, 
 )
 from .analyzer import AnalyzerConfig, QualityConfig, TEXT_QUALITY_EXAMPLE_MESSAGES
+from .dedup import DedupConfig, SemanticDedupConfig
 from .saver import SaverConfig, LocalSaverConfig, FileType
 

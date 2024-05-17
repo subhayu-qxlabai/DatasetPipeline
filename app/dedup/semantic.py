@@ -1,8 +1,9 @@
-from typing import Literal
+from typing import Any, Literal
 from functools import cached_property
 
-from datasets import Dataset
+import pandas as pd
 from langchain.vectorstores import FAISS
+from datasets import Dataset, DatasetDict
 from langchain_community.embeddings.huggingface import HuggingFaceEmbeddings
 
 from .base import BaseConfig, BaseDedup
@@ -11,8 +12,8 @@ from ..helpers.embeddings import Embeddings
 
 
 class SemanticDedupConfig(BaseConfig):
-    threshold: float = 0.8
-    dedup_column: str = "messages"
+    column: str = "messages"
+    threshold: float = 0.2
     cache_embeddings: bool = False
     embeddings_model: str = "sentence-transformers/multi-qa-mpnet-base-dot-v1"
     device: Literal['mps', 'cuda', 'npu', 'hpu', 'cpu'] | None = None
@@ -38,20 +39,21 @@ class SemanticDedup(BaseDedup):
     def can_be_deduped(self):
         if not isinstance(self.dataset, Dataset) or self.dataset.shape[0] == 0:
             return False
-        if self.config.dedup_column not in self.dataset.column_names:
+        if self.config.column not in self.dataset.column_names:
             return False
-        _col = self.dataset[self.config.dedup_column]
+        _col = self.dataset[self.config.column]
         if not all(isinstance(x, str) for x in _col):
             return False
         if len(_col) == len(set(_col)):
             return False
         return True
-    
-    def _dedup(self):
+
+    def _dedup(self) -> DatasetDict:
         if not self.can_be_deduped:
             return self.dataset
+
+        texts = self.dataset[self.config.column]
         embeddings = self.embeddings.embed_documents(texts)
-        texts = self.dataset[self.config.dedup_column]
         text_embeddings: list[tuple[str, list[float]]] = list(zip(
             texts, embeddings
         ))
@@ -62,19 +64,46 @@ class SemanticDedup(BaseDedup):
             metadatas=[{"id": _id} for _id in ids],
             ids=ids,
         )
-        
-        try:
-            dataset = self.dataset.remove_columns("_id")
-        except:
-            dataset = self.dataset
-        
-        dataset: Dataset = (
-            dataset
-            .add_column("_embeddings", embeddings)
-            .add_column("_id", ids)
+
+        embeddings_col = "_embeddings"
+        score_col = "score"
+        match_col = "match"
+
+        dataset: Dataset = self.dataset.add_column(embeddings_col, embeddings)
+        del texts, embeddings, text_embeddings, ids
+
+        def add_score_and_match(row: dict[str, Any]) -> dict[str, str | float]:
+            doc, score = vdb.similarity_search_with_score_by_vector(row[embeddings_col], k=2)[-1]
+            return {match_col: doc.page_content, score_col: score}
+
+        df: pd.DataFrame = dataset.map(add_score_and_match).to_pandas()
+
+        del vdb, dataset
+
+        # normalize the scores between 0 and 1
+        scores = df[score_col]
+        df[score_col] = (scores - scores.min()) / (scores.max() - scores.min())
+
+        threshold = self.config.threshold
+
+        deduped_df = (
+            pd.concat(
+                [
+                    df.query(f"{score_col} < {threshold}").drop_duplicates(score_col),
+                    df.query(f"{score_col} >= {threshold}"),
+                ]
+            )
+            .drop(columns=[embeddings_col, match_col, score_col])
+            .sort_index()
         )
-        
-        # TODO: Add deduplication logic here
-        
-        return dataset
-        
+
+        dd = DatasetDict(
+            deduplicated=Dataset.from_pandas(deduped_df),
+            duplicates=Dataset.from_pandas(
+                self.dataset.to_pandas().query(
+                    f"{self.config.column} not in @deduped_df.{self.config.column}"
+                )
+            ),
+        )
+
+        return dd

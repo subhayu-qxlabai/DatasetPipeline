@@ -1,26 +1,30 @@
 from pathlib import Path
-from datasets import Dataset
+from itertools import chain
+from datasets import Dataset, DatasetDict
 
 from .models import BaseModel
 from .loader import Loader, LoaderConfig
 from .format import Format, FormatConfig
+from .dedup import Dedup, DedupConfig
 from .analyzer import Analyzer, AnalyzerConfig
 from .saver import Saver, SaverConfig
 from .helpers.utils import run_parallel_exec
+from .helpers.logger import LOGGER
 
 
 class JobConfig(BaseModel):
-    loader: LoaderConfig
+    load: LoaderConfig
     format: FormatConfig | None = FormatConfig()
-    analyzer: AnalyzerConfig | None = AnalyzerConfig()
-    saver: SaverConfig | None = SaverConfig()
+    deduplicate: DedupConfig | None = DedupConfig()
+    analyze: AnalyzerConfig | None = AnalyzerConfig()
+    save: SaverConfig | None = SaverConfig()
 
 
 class Job(BaseModel):
     config: JobConfig
-    
+
     def load(self):
-        loader = Loader(self.config.loader)
+        loader = Loader(self.config.load)
         return loader.load()
 
     def format(self, dataset: Dataset, textualize: bool = False):
@@ -30,35 +34,57 @@ class Job(BaseModel):
         return format.format(textualize=textualize)
 
     def analyze(self, dataset: Dataset):
-        if self.config.analyzer is None:
+        if self.config.analyze is None:
             return dataset
-        analyzer = Analyzer(dataset, self.config.analyzer)
+        analyzer = Analyzer(dataset, self.config.analyze)
         return analyzer.analyze()
-    
+
+    def dedup(self, dataset: Dataset):
+        if self.config.deduplicate is None:
+            return dataset
+        dedup = Dedup(dataset, self.config.deduplicate)
+        return dedup.dedup()
+
     def save(self, name_and_dataset: tuple[str, Dataset]):
-        if self.config.saver is None:
+        if self.config.save is None:
             return
         name, dataset = name_and_dataset
-        self.config.saver.local.filename = name
-        saver = Saver(dataset, self.config.saver)
+        self.config.save.local.filename = name
+        saver = Saver(dataset, self.config.save)
         return saver.save()
-    
-    def _format_and_analyze(self, name_and_dataset: tuple[str, Dataset], textualize: bool = False):
+
+    def _format_dedup_and_analyze(
+        self, name_and_dataset: tuple[str, Dataset], textualize: bool = False
+    ) -> list[tuple[str, Dataset]]:
         name, dataset = name_and_dataset
         dataset = self.format(dataset, textualize)
         dataset = self.analyze(dataset)
-        return (name, dataset)
+        dataset = self.dedup(dataset)
+        if isinstance(dataset, DatasetDict):
+            return [(f"{name}-{split}", dst) for split, dst in dataset.items()]
+        return [(name, dataset)]
 
     def run(self) -> list[Path | Dataset]:
         data: dict[str, Dataset] = self.load()
-        data: list[tuple[tuple[str, Dataset], ...]] = run_parallel_exec(
-            self._format_and_analyze, list(data.items()), True
-        )
-        data: list[tuple[str, Dataset]] = [(name, dst) for _, (name, dst) in data]
-        if self.config.saver is not None:
+        data: list[
+            tuple[tuple[str, Dataset], list[tuple[str, Dataset]]] | Exception
+        ] = run_parallel_exec(self._format_dedup_and_analyze, list(data.items()), True)
+        errors = [
+            (name, response)
+            for (name, _), response in data
+            if isinstance(response, Exception)
+        ]
+        if errors:
+            for name, error in errors:
+                LOGGER.error(f"Error during processing {name!r}: {error}")
+            
+        data: list[list[tuple[str, Dataset]]] = [
+            _data for (_, _), _data in data if not isinstance(_data, Exception)
+        ]
+        data: list[tuple[str, Dataset]] = list(chain(*data))
+        if self.config.save is not None:
             data = run_parallel_exec(self.save, data)
         return data
 
     def __call__(self) -> list[Path | Dataset]:
         return self.run()
-    

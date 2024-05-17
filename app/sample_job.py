@@ -2,27 +2,27 @@ from pprint import pprint
 from .job import Job, JobConfig
 from .loader import LoaderConfig, HFLoaderConfig
 from .format import (
-    FormatConfig, 
-    MergerConfig, 
-    FieldConfig, 
-    SFTConfig, 
-    Role, 
-    DPOConfig, 
-    DPOColumns,  
-    ToTextConfig, 
+    FormatConfig,
+    MergerConfig,
+    FieldConfig,
+    SFTConfig,
+    Role,
+    DPOConfig,
+    DPOColumns,
+    ToTextConfig,
     RoleConfig,
-    OutputConfig, 
+    OutputConfig,
 )
-from .analyzer import AnalyzerConfig, QualityConfig, TEXT_QUALITY_EXAMPLE_MESSAGES
+from .analyzer import AnalyzerConfig, QualityConfig
+from .dedup import DedupConfig, SemanticDedupConfig
 from .saver import SaverConfig, LocalSaverConfig, FileType
 
 
 config = JobConfig(
-    loader=LoaderConfig(
+    load=LoaderConfig(
         huggingface=[
             HFLoaderConfig(
                 path="davanstrien/data-centric-ml-sft",
-                merge=True,
             ),
         ]
     ),
@@ -69,12 +69,69 @@ config = JobConfig(
             return_only_messages=True,
         ),
     ),
-    analyzer=AnalyzerConfig(
-        quality=QualityConfig(
-            column_name="messages",
+    deduplicate=DedupConfig(
+        semantic=SemanticDedupConfig(
+            threshold=0.2,
         )
     ),
-    saver=SaverConfig(
+    analyze=AnalyzerConfig(
+        quality=QualityConfig(
+            column_name="messages",
+            categories=[
+                "code",
+                "math",
+                "job",
+                "essay",
+                "translation",
+                "literature",
+                "history",
+                "science",
+                "medicine",
+                "news",
+                "finance",
+                "geography",
+                "philosophy",
+                "psychology",
+                "education",
+                "art",
+                "music",
+                "technology",
+                "environment",
+                "food",
+                "sports",
+                "fashion",
+                "travel",
+                "culture",
+                "language",
+                "religion",
+                "politics",
+                "space",
+                "entertainment",
+                "healthcare",
+                "animals",
+                "weather",
+                "architecture",
+                "automotive",
+                "business",
+                "comedy",
+                "crime",
+                "diy",
+                "economics",
+                "gaming",
+                "law",
+                "marketing",
+                "parenting",
+                "science_fiction",
+                "social_media",
+                "mythology",
+                "folklore",
+                "astrology",
+                "horror",
+                "mystery",
+            ],
+        )
+    ),
+    save=SaverConfig(
         local=LocalSaverConfig(
             directory="processed",
             filetype=FileType.PARQUET,  # can also be sent as a string
@@ -86,4 +143,3 @@ config = JobConfig(
 if __name__ == "__main__":
     job = Job(config)
     pprint(job.to_yaml())
-    

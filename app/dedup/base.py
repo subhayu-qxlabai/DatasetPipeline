@@ -1,8 +1,12 @@
 from abc import ABC, abstractmethod
 
-from datasets import Dataset
+from datasets import Dataset, DatasetDict
+
 from ..models.base import BaseModel
 
+
+def get_empty_dataset(columns: list[str]):
+    return Dataset.from_dict({x: [] for x in columns})
 
 class BaseConfig(BaseModel):
     pass
@@ -45,25 +49,28 @@ class BaseDedup(ABC):
         return self.__class__.__name__.replace("Dedup", "")
     
     @abstractmethod
-    def _dedup(self) -> Dataset:
+    def _dedup(self) -> DatasetDict:
         """
-        Method that returns a deduplicated Dataset object.
+        Method that returns a deduplicated DatasetDict object with keys: `deduplicated` and `duplicates`.
 
-        :return: A deduplicated Dataset object.
-        :rtype: Dataset
+        :return: A deduplicated DatasetDict object with keys: `deduplicated` and `duplicates`.
+        :rtype: DatasetDict
         """
         pass
     
-    def dedup(self) -> Dataset:
+    def dedup(self) -> DatasetDict:
         """
-        Method that returns a deduplicated Dataset object.
+        Method that returns a deduplicated DatasetDict object with keys: `deduplicated` and `duplicates`.
 
-        :return: A deduplicated Dataset object.
-        :rtype: Dataset
+        :return: A deduplicated DatasetDict object with keys: `deduplicated` and `duplicates`.
+        :rtype: DatasetDict
         """
         if self.has_config:
             return self._dedup()
-        return self.dataset
+        return DatasetDict(
+            deduplicated=self.dataset,
+            duplicates=get_empty_dataset(self.dataset.column_names),
+        )
 
     def __or__(self, cls: type["BaseDedup"]):
         instance = cls(self.dedup())
