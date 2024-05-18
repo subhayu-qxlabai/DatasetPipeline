@@ -1,0 +1,87 @@
+load:
+    huggingface:
+    -   path: jondurbin/airoboros-3.2
+        split: train
+        save: false
+        take_rows: 1000
+format:
+    to_text:
+        system:
+            template: 'SYSTEM: {system}'
+            key: system
+        user:
+            template: 'USER: {user}'
+            key: user
+        assistant:
+            template: 'ASSISTANT: {assistant}'
+            key: assistant
+        message_role_field: role
+        message_content_field: content
+        separator: '
+
+
+            '
+    output:
+        return_only_messages: true
+deduplicate:
+    semantic:
+        column: messages
+        threshold: 0.2
+analyze:
+    quality:
+            column_name: messages
+            categories: 
+            - code 
+            - math 
+            - job 
+            - essay 
+            - translation 
+            - literature 
+            - history 
+            - science 
+            - medicine 
+            - news 
+            - finance 
+            - geography 
+            - philosophy 
+            - psychology 
+            - education 
+            - art 
+            - music 
+            - technology 
+            - environment 
+            - food 
+            - sports 
+            - fashion 
+            - travel 
+            - culture 
+            - language 
+            - religion 
+            - politics 
+            - space 
+            - entertainment 
+            - healthcare 
+            - animals 
+            - weather 
+            - architecture 
+            - automotive 
+            - business 
+            - comedy 
+            - crime 
+            - diy 
+            - economics 
+            - gaming 
+            - law 
+            - marketing 
+            - parenting 
+            - science_fiction 
+            - social_media 
+            - mythology 
+            - folklore 
+            - astrology 
+            - horror 
+            - mystery
+save:
+    local:
+        directory: processed
+        filetype: parquet
