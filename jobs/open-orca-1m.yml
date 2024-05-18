@@ -1,4 +1,4 @@
-loader:
+load:
     huggingface:
     -   path: Open-Orca/1million-gpt-4
         split: train
@@ -8,7 +8,7 @@ format:
     to_text: null
     output:
         return_only_messages: true
-saver:
+save:
     local:
         directory: processed
         filetype: parquet
