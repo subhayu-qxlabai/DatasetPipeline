@@ -57,7 +57,7 @@ The project utilizes Typer for the command-line interface. The main entry point 
 To list all jobs in the pipeline, use the following command:
 
 ```bash
-run pipeline list <path-to-config-or-directory>
+./run pipeline list <path-to-config-or-directory>
 ```
 
 ### Running the Pipeline
@@ -65,7 +65,7 @@ run pipeline list <path-to-config-or-directory>
 To run the pipeline based on the specified configuration, use:
 
 ```bash
-run pipeline run <path-to-config-or-directory>
+./run pipeline run <path-to-config-or-directory>
 ```
 
 ### Generating a Sample Job Configuration
@@ -73,7 +73,7 @@ run pipeline run <path-to-config-or-directory>
 To generate a sample job configuration and print it to stdout or save it to a file, use:
 
 ```bash
-run pipeline sample [path-to-output-file]
+./run pipeline sample <path-to-output-file>
 ```
 
 If no file path is specified, the configuration will be printed to stdout.
@@ -130,48 +130,6 @@ analyze:
             - literature
             - history
             - science
-            - medicine
-            - news
-            - finance
-            - geography
-            - philosophy
-            - psychology
-            - education
-            - art
-            - music
-            - technology
-            - environment
-            - food
-            - sports
-            - fashion
-            - travel
-            - culture
-            - language
-            - religion
-            - politics
-            - space
-            - entertainment
-            - healthcare
-            - animals
-            - weather
-            - architecture
-            - automotive
-            - business
-            - comedy
-            - crime
-            - diy
-            - economics
-            - gaming
-            - law
-            - marketing
-            - parenting
-            - science_fiction
-            - social_media
-            - mythology
-            - folklore
-            - astrology
-            - horror
-            - mystery
 
 save:
     local:
@@ -184,7 +142,7 @@ save:
 To run this job, use the following command:
 
 ```bash
-run pipeline run jobs/aeroboros-conv.yml
+./run pipeline run jobs/aeroboros-conv.yml
 ```
 
 This command will execute the pipeline according to the configuration specified in the `aeroboros-conv.yml` file, processing the data and saving the results as described.
