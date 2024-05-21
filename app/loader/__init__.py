@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 from datasets import Dataset, DatasetDict
-from pydantic import Field
+from pydantic import Field, model_validator
 
 from .base import BaseLoader, BaseConfig, BaseModel
 from .huggingface import HFLoader, HFLoaderConfig
@@ -9,8 +9,14 @@ from .local_file import LocalFileLoader, LocalFileLoaderConfig
 
 
 class LoaderConfig(BaseModel):
-    huggingface: list[HFLoaderConfig] = Field(default_factory=list, description="Configurations for loading datasets from HuggingFace Hub.")
-    local: list[LocalFileLoaderConfig] = Field(default_factory=list, description="Configurations for loading datasets from local file system.")
+    huggingface: HFLoaderConfig | None = Field(default=None, description="Configurations for loading datasets from HuggingFace Hub.")
+    local: LocalFileLoaderConfig | None = Field(default=None, description="Configurations for loading datasets from local file system.")
+    
+    @model_validator(mode='after')
+    def verify_square(self):
+        if self.huggingface is None and self.local is None:
+            raise ValueError('At least one of `huggingface` or `local` loaders must be specified.')
+        return self
     
 
 @dataclass
@@ -19,8 +25,8 @@ class Loader:
     
     def __post_init__(self):
         self.loaders: list[BaseLoader] = [
-            *[HFLoader(loader) for loader in self.config.huggingface],
-            *[LocalFileLoader(loader) for loader in self.config.local],
+            *[HFLoader(self.config.huggingface)],
+            *[LocalFileLoader(self.config.local)],
         ]
 
     def load(self) -> DatasetDict:

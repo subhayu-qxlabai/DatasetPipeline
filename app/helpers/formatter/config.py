@@ -25,6 +25,3 @@ class FormatterConfig(BaseModel):
             + self.separator 
             + f"{self.user.template[:4]}..."
         )
-    
-    def __repr__(self):
-        return str(self)
