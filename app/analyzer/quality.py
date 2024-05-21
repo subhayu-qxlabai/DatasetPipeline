@@ -3,7 +3,7 @@ from warnings import warn
 
 from retry import retry
 from datasets import Dataset
-from pydantic import model_validator
+from pydantic import model_validator, Field
 
 from .base import BaseAnalyzer, BaseConfig
 from ..constants import MessageRole as Role
@@ -40,9 +40,9 @@ TEXT_QUALITY_EXAMPLE_MESSAGES = Messages(
 )
 
 class QualityConfig(BaseConfig):
-    column_name: str = "messages"
-    categories: list[str] | None = None
-    example_messages: Messages = TEXT_QUALITY_EXAMPLE_MESSAGES
+    column_name: str = Field(default="messages",description="Name of the column to check the quality. Defaults to 'messages'")
+    categories: list[str] | None = Field(default=None,description="List of categories to use. Defaults to 'null'")
+    example_messages: Messages = Field(default=TEXT_QUALITY_EXAMPLE_MESSAGES,description=f"Defines the example messages.")
     
     @model_validator(mode="after")
     def validate_messages(self):

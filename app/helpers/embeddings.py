@@ -36,7 +36,7 @@ class Embeddings:
             self.embeddings_directory / f"{self.hash_text(text).hex}{self.filename_suffix}"
         )
 
-    def embed_documents_with_caching(self, texts: str):
+    def embed_documents_with_caching(self, texts: list[str]):
         text_file_map = {x: self.get_file_path(x) for x in texts}
         file_text_map = {file: text for text, file in text_file_map.items()}
         text_filename_map = {text: file.name for file, text in file_text_map.items()}

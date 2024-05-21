@@ -1,13 +1,14 @@
 from dataclasses import dataclass
 
 from datasets import Dataset
+from pydantic import Field
 
 from .base import BaseSaver, BaseConfig, BaseModel
 from .local import LocalSaver, LocalSaverConfig, LocalDirSaverConfig, FileType
 
 
 class SaverConfig(BaseModel):
-    local: LocalSaverConfig | None = LocalSaverConfig()
+    local: LocalSaverConfig | None = Field(default=LocalSaverConfig(), description="Configuration for saving the dataset locally.")
 
 
 @dataclass

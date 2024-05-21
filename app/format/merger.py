@@ -3,18 +3,19 @@ from datasets import Dataset
 
 from .base import BaseFormat, BaseConfig
 from ..constants import MessageRole as Role
+from pydantic import Field
 
 
 class FieldConfig(BaseConfig):
-    fields: list[str] | None = None
-    separator: str = " "
-    merged_field: str | None = None
+    fields: list[str] | None = Field(default=None, description="List of column names to merge. Defaults to 'null'")
+    separator: str = Field(default=" ", description="Seperator to merge the column. Defaults to ' '")
+    merged_field: str | None = Field(default=None, description="Merged column name.")
 
 class MergerConfig(BaseConfig):
     system: FieldConfig | None = FieldConfig(merged_field=Role.SYSTEM.value)
     user: FieldConfig | None = FieldConfig(merged_field=Role.USER.value)
     assistant: FieldConfig | None = FieldConfig(merged_field=Role.ASSISTANT.value)
-    remove_other_cols: bool = False
+    remove_other_cols: bool = Field(default=False, description="Whether remove other columns. Defaults to 'False'")
 
 
 class MergerFormat(BaseFormat):

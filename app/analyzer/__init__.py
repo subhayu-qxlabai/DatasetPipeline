@@ -2,6 +2,7 @@ from functools import partial
 from dataclasses import dataclass
 
 from datasets import Dataset
+from pydantic import Field
 
 from .base import BaseAnalyzer, BaseConfig, BaseModel
 from .quality import QualityAnalyzer, QualityConfig, Message, Messages, TEXT_QUALITY_EXAMPLE_MESSAGES
@@ -9,7 +10,7 @@ from .output import OutputAnalyzer
 
 
 class AnalyzerConfig(BaseModel):
-    quality: QualityConfig | None = QualityConfig()
+    quality: QualityConfig | None = Field(default=QualityConfig(), description="Configuration for qualitative analysis.")
     
 
 @dataclass

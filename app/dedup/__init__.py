@@ -2,13 +2,14 @@ from functools import partial
 from dataclasses import dataclass
 
 from datasets import Dataset, DatasetDict
+from pydantic import Field
 
 from .base import BaseDedup, BaseConfig, BaseModel
 from .semantic import SemanticDedup, SemanticDedupConfig
 
 
 class DedupConfig(BaseModel):
-    semantic: SemanticDedupConfig | None = SemanticDedupConfig()
+    semantic: SemanticDedupConfig | None = Field(default=SemanticDedupConfig(), description="Configuration for semantic deduplication.")
 
 
 @dataclass

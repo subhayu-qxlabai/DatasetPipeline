@@ -9,16 +9,17 @@ from langchain_community.embeddings.huggingface import HuggingFaceEmbeddings
 from .base import BaseConfig, BaseDedup
 from ..helpers.utils import hash_uuid
 from ..helpers.embeddings import Embeddings
+from pydantic import Field
 
 
 class SemanticDedupConfig(BaseConfig):
-    column: str = "messages"
-    threshold: float = 0.2
-    cache_embeddings: bool = False
-    embeddings_model: str = "sentence-transformers/multi-qa-mpnet-base-dot-v1"
-    device: Literal['mps', 'cuda', 'npu', 'hpu', 'cpu'] | None = None
-    multi_process: bool = False
-    show_progress: bool = True
+    column: str = Field(default="messages",description="Name of the column to deduplicate. Defaults to 'messages'")
+    threshold: float = Field(default=0.8,description="Minimum threshold to consider two messages similar. Defaults to '0.8'")
+    cache_embeddings: bool = Field(default=False,description="Whether to cache the embeddings. Defaults to 'false'")
+    embeddings_model: str = Field(default="sentence-transformers/multi-qa-mpnet-base-dot-v1",description="Name of the embedding model to use from huggingface. Defaults to 'sentence-transformers/multi-qa-mpnet-base-dot-v1'")
+    device: Literal['mps', 'cuda', 'npu', 'hpu', 'cpu'] | None = Field(default=None,description="Name of the device to use. Can be one of 'mps', 'cuda', 'npu', 'hpu', 'cpu'. Defaults to 'null'")
+    multi_process: bool = Field(default=False,description="Whether to use multiple processing. Use only when the dataset is too large. Defaults to 'false'")
+    show_progress: bool = Field(default=True,description="Whether to show the progress of the deduplication status. Defaults to 'true'")
 
 
 class SemanticDedup(BaseDedup):
@@ -84,7 +85,7 @@ class SemanticDedup(BaseDedup):
         scores = df[score_col]
         df[score_col] = (scores - scores.min()) / (scores.max() - scores.min())
 
-        threshold = self.config.threshold
+        threshold = 1 - self.config.threshold
 
         deduped_df = (
             pd.concat(

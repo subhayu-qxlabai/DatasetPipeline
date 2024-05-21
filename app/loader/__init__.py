@@ -9,8 +9,8 @@ from .local_file import LocalFileLoader, LocalFileLoaderConfig
 
 
 class LoaderConfig(BaseModel):
-    huggingface: list[HFLoaderConfig] = Field(default_factory=list)
-    local: list[LocalFileLoaderConfig] = Field(default_factory=list)
+    huggingface: list[HFLoaderConfig] = Field(default_factory=list, description="Configurations for loading datasets from HuggingFace Hub.")
+    local: list[LocalFileLoaderConfig] = Field(default_factory=list, description="Configurations for loading datasets from local file system.")
     
 
 @dataclass

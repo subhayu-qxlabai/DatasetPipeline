@@ -3,7 +3,7 @@ from pathlib import Path
 from warnings import warn
 
 from datasets import Dataset
-from pydantic import model_validator, field_validator, computed_field
+from pydantic import model_validator, field_validator, computed_field,Field
 
 from .base import BaseSaver, BaseConfig
 from ..helpers.utils import get_ts_filename
@@ -16,8 +16,8 @@ class FileType(str, Enum):
 
 
 class LocalDirSaverConfig(BaseConfig):
-    directory: Path | str = "processed"
-    filetype: FileType | str | None = FileType.PARQUET
+    directory: Path | str = Field(default="processed",description="Directory path to save the dataset. Defaults to 'processed'")
+    filetype: FileType | str | None = Field(default=FileType.PARQUET,description=f"Filetype to save the dataset. Can be one of '{FileType.CSV}', '{FileType.JSON}' or '{FileType.PARQUET}'. Defaults to '{FileType.PARQUET}'")
 
     @field_validator('directory')
     @classmethod
@@ -38,7 +38,7 @@ class LocalDirSaverConfig(BaseConfig):
         return FileType.PARQUET
 
 class LocalSaverConfig(LocalDirSaverConfig):
-    filename: str | None = None
+    filename: str | None = Field(default=None,description="Filename to save the dataset. If null auto generates a time based filename and saves in parquet.")
     
     @model_validator(mode="after")
     def validate_fields(self):

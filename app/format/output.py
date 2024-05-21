@@ -1,10 +1,10 @@
 from datasets import Dataset
-
+from pydantic import Field
 from .base import BaseFormat, BaseConfig
 
 
 class OutputConfig(BaseConfig):
-    return_only_messages: bool = False
+    return_only_messages: bool = Field(default=False,description="Whether to only keep the 'messages' column. Defaults to 'False'")
 
 class OutputFormat(BaseFormat):
     def __init__(self, dataset: Dataset, config: OutputConfig = OutputConfig()):

@@ -3,6 +3,7 @@ from functools import partial
 from dataclasses import dataclass
 
 from datasets import Dataset
+from pydantic import Field
 
 from .base import BaseFormat, BaseConfig
 from .sft import SFTFormat, SFTConfig, Role
@@ -43,13 +44,13 @@ def get_format(text_format: ChatFormat) -> ToTextConfig:
             )
 
 class FormatConfig(BaseConfig):
-    merger: MergerConfig | None = MergerConfig()
-    sft: SFTConfig | None = SFTConfig()
-    dpo: DPOConfig | None = DPOConfig()
-    conv: ConvConfig | None = ConvConfig()
-    conv_text: ConvTextConfig | None = None
-    to_text: ToTextConfig | None = ToTextConfig()
-    output: OutputConfig | None = OutputConfig()
+    merger: MergerConfig | None = Field(default=MergerConfig(), description="Configuration for merging different columns into 'system', 'user' and 'assistant'")
+    sft: SFTConfig | None = Field(default=SFTConfig(), description="Configuration for detecting 'system', 'user' and 'assistant' columns")
+    dpo: DPOConfig | None = Field(default=DPOConfig(), description="Configuration for detecting 'system', 'user', 'chosen' and 'rejected' columns")
+    conv: ConvConfig | None = Field(default=ConvConfig(), description="Configuration for detecting and converting conversational object formats. Columns having values like `list[dict[str, str]]`")
+    conv_text: ConvTextConfig | None = Field(default=None, description="Configuration for detecting and converting conversational text formats.")
+    to_text: ToTextConfig | None = Field(default=ToTextConfig(), description="Configuration for converting standardized messages to text format.")
+    output: OutputConfig | None = Field(default=OutputConfig(), description="Configuration for outputting the formatted dataset.")
 
 
 @dataclass

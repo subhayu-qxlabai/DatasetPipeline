@@ -1,7 +1,7 @@
 import json
 
 from datasets import Dataset
-from pydantic import model_validator
+from pydantic import model_validator,Field
 
 from .base import BaseFormat, BaseConfig
 from ..helpers.regex_dict import RegexDict
@@ -36,8 +36,8 @@ PATTERN_ROLE_MAP = {
 }
 
 class SFTConfig(BaseConfig):
-    use_openai: bool = False
-    column_role_map: dict[str, Role|str] = PATTERN_ROLE_MAP
+    use_openai: bool = Field(default=False, description="Whether to use OpenAI to detect 'system', 'user' and 'assistant' columns. Defaults to 'false'")
+    column_role_map: dict[str, Role|str] = Field(default=PATTERN_ROLE_MAP, description=f"Mapping between column names and role. Roles can be `user` and `assistant`, optionally `system`")
 
     @model_validator(mode="after")
     def validate_column_role_map(self):
