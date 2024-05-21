@@ -20,11 +20,9 @@ from .saver import SaverConfig, LocalSaverConfig, FileType
 
 config = JobConfig(
     load=LoaderConfig(
-        huggingface=[
-            HFLoaderConfig(
-                path="davanstrien/data-centric-ml-sft",
-            ),
-        ]
+        huggingface=HFLoaderConfig(
+            path="davanstrien/data-centric-ml-sft",
+        )
     ),
     format=FormatConfig(
         merger=MergerConfig(

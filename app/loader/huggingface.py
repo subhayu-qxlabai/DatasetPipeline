@@ -30,7 +30,7 @@ class HFLoader(BaseLoader):
         )
 
 
-    def load(self) -> DatasetDict:
+    def _load(self) -> DatasetDict:
         dsts = self.load_or_download()
         path_datasets_map = [
             (path, dst if isinstance(dst, DatasetDict) else {0: dst})

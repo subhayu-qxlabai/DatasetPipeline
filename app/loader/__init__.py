@@ -33,7 +33,11 @@ class Loader:
         path_dataset_map = {}
         for loader in self.loaders:
             dst = loader.load()
-            path_dataset_map.update(dst if isinstance(dst, DatasetDict) else DatasetDict({0: dst}))
+            if dst is None:
+                continue
+            path_dataset_map.update(
+                dst if isinstance(dst, DatasetDict) else DatasetDict({0: dst})
+            )
         
         return DatasetDict(path_dataset_map)
     

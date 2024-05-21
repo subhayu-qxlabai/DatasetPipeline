@@ -33,7 +33,7 @@ class LocalFileLoader(BaseLoader):
         super().__init__(config)
         self.config: LocalFileLoaderConfig
     
-    def load(self) -> DatasetDict:
+    def _load(self) -> DatasetDict:
         loader_method = f"from_{self.config.path.suffix.replace('.', '').replace('jsonl', 'json')}"
         dsts: Dataset = getattr(Dataset, loader_method)(self.config.path.as_posix())
         return DatasetDict({self.config.path.as_posix(): dsts})

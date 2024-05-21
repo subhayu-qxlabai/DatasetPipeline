@@ -21,7 +21,7 @@ class BaseLoader(ABC):
         self.config = config
     
     @abstractmethod
-    def load(self) -> Dataset | DatasetDict:
+    def _load(self) -> Dataset | DatasetDict:
         """
         Method that loads a Dataset or DatasetDict.
 
@@ -29,3 +29,8 @@ class BaseLoader(ABC):
         :rtype: Dataset
         """
         pass
+    
+    def load(self) -> Dataset | DatasetDict | None:
+        if self.config is None:
+            return
+        return self._load()
