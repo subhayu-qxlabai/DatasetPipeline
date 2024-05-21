@@ -1,11 +1,11 @@
-from datetime import datetime
-from pathlib import Path
-from random import randrange
 import re
 import uuid
 import traceback
+from pathlib import Path
+from random import randrange
+from datetime import datetime
 from concurrent import futures
-from typing import Any, Iterable, Callable, NamedTuple
+from typing import Any, Iterable, Callable, MutableMapping, NamedTuple
 
 from fuzzywuzzy import process
 
@@ -79,6 +79,8 @@ def run_parallel_exec(exec_func: Callable, iterable: Iterable, *func_args, **kwa
         >>> from app.utils.helpers import run_parallel_exec
         >>> run_parallel_exec(str, [1, 2, 3])
         [(1, '1'), (2, '2'), (3, '3')]
+        >>> run_parallel_exec(len, ["Rahul", "Sachin", "Dhoni"])
+        [('Sachin', 6), ('Rahul', 5), ('Dhoni', 5)]
     """
     error_logger: Callable[[str], None] = kwargs.pop("error_logger", print)
     with futures.ThreadPoolExecutor(
@@ -106,6 +108,13 @@ def run_parallel_exec_but_return_in_order(exec_func: Callable, iterable: Iterabl
     """
     Runs the `exec_func` function in parallel for each element in the `iterable` using a thread pool executor.
     Returns the result in the same order as the `iterable`.
+    
+    Example:
+        >>> from app.utils.helpers import run_parallel_exec_but_return_in_order
+        >>> run_parallel_exec_but_return_in_order(str, [1, 2, 3])
+        ['1', '2', '3']
+        >>> run_parallel_exec_but_return_in_order(len, ["Rahul", "Sachin", "Dhoni"])
+        [5, 6, 5]
     """
     # note this is usable only when iterable has types that are hashable
     result = run_parallel_exec(exec_func, iterable:=list(iterable), *func_args, **kwargs)
@@ -140,6 +149,9 @@ class Match(NamedTuple):
 def find_best_match(query: str, options: list[str], cutoff: int = 0):
     """Find the best match from a list of options"""
     return Match(*(process.extractOne(query, options, score_cutoff=cutoff) or (None, 0)))
+
+def get_match_score(q1: str, q2: str) -> int:
+    return find_best_match(q1, [q2], cutoff=0).score
 
 def recursive_string_operator(
     data, fn: Callable[[str], str], skip_keys: list[str] = [], max_workers=4
@@ -208,6 +220,18 @@ def recursive_string_operator(
             for k, v in data.items()
         }
     return data
+
+def recursive_dict_operator(d: dict, fn: Callable[[dict], MutableMapping]):
+    has_dict = any(isinstance(v, dict) for _, v in d.items())
+    if has_dict:
+        return fn(
+            {
+                k: recursive_dict_operator(v, fn) if isinstance(v, dict) else v
+                for k, v in d.items()
+            }
+        )
+    else:
+        return fn(d)
 
 
 def get_timestamp_uid(make_uuid=True):
