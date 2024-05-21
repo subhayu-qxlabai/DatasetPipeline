@@ -1,11 +1,11 @@
 from typing import Any
 
 from datasets import Dataset
-from pydantic import model_validator
+from pydantic import Field, model_validator
 
 from .base import BaseFormat, BaseConfig
 from ..helpers.regex_dict import RegexDict
-from ..constants import DPOColumns, MessageRole as Role, MessageField as Field
+from ..constants import DPOColumns, MessageRole as Role, MessageField
 
 
 PATTERN_ROLE_MAP = {
@@ -23,7 +23,10 @@ PATTERN_ROLE_MAP = {
 }
 
 class DPOConfig(BaseConfig):
-    column_role_map: dict[str, DPOColumns|str] = PATTERN_ROLE_MAP
+    column_role_map: dict[str, DPOColumns|str] = Field(
+        default=PATTERN_ROLE_MAP,
+        description="A mapping of column names to role of each column in the dataset. Roles can be `user`, `system`, `chosen` or `rejected`."
+    )
 
     @model_validator(mode="after")
     def validate_column_role_map(self):
@@ -82,7 +85,7 @@ class DPOFormat(BaseFormat):
                         else Role.USER if col_type == DPOColumns.USER 
                         else Role.ASSISTANT
                     )
-                    messages.append({Field.ROLE.value: role.value, Field.CONTENT.value: row[col]})
+                    messages.append({MessageField.ROLE.value: role.value, MessageField.CONTENT.value: row[col]})
 
         deduped_messages: list[dict[str, str]] = []
         for message in messages:

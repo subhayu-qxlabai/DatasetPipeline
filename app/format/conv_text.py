@@ -1,15 +1,17 @@
 from datasets import Dataset
 
+from pydantic import Field
+
 from .base import BaseFormat, BaseConfig
 from ..helpers import run_parallel_exec
 from ..helpers.text_utils import TextUtils as tu
 from ..helpers.call_openai import call_openai_api
-from ..constants import MessageRole as Role, MessageField as Field
+from ..constants import MessageRole as Role, MessageField
 
 
 class ConvTextConfig(BaseConfig):
-    conv_col: str | None = None
-    conv_template: str | None = None
+    column: str | None = Field(default=None, description="Name of the column with the conversation. Defaults to `null`.")
+    conv_template: str | None = Field(default=None, description="Template for the conversation. Templates have to contain `{user}` and `{assistant}`, optionally `{system}`. Defaults to `null`.")
 
 
 class ConversationalTextFormat(BaseFormat):
@@ -77,7 +79,7 @@ class ConversationalTextFormat(BaseFormat):
         parsed_dict = tu.parse_to_dict(template, text)
         roles_ordered = (Role.SYSTEM.value, Role.USER.value, Role.ASSISTANT.value)
         parsed_dict = sorted(parsed_dict.items(), key=lambda item: roles_ordered.index(item[0]))
-        return [{Field.ROLE.value: k, Field.CONTENT.value: v} for k, v in parsed_dict]
+        return [{MessageField.ROLE.value: k, MessageField.CONTENT.value: v} for k, v in parsed_dict]
 
     @staticmethod
     def _get_template_openai(text: str, column_name: str = None):
@@ -131,13 +133,13 @@ class ConversationalTextFormat(BaseFormat):
 
     def _get_col_template_map(self):
         conv_col_keys = (
-            [self.config.conv_col] if self.config.conv_col 
+            [self.config.column] if self.config.column 
             else self._get_text_conv_cols_openai()
         )
         col_template_map = run_parallel_exec(
             lambda x: (
                 [self.config.conv_template] 
-                if self.config.conv_template and self.config.conv_col in conv_col_keys 
+                if self.config.conv_template and self.config.column in conv_col_keys 
                 else self._get_template_openai(x[1], x[0])
             ), 
             [

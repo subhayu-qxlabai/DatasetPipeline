@@ -1,8 +1,8 @@
 from enum import Enum
 from pathlib import Path
 
-from pydantic import model_validator
 from datasets import Dataset, DatasetDict
+from pydantic import Field, model_validator
 
 from .base import BaseLoader, BaseConfig
 
@@ -14,8 +14,8 @@ class FileType(str, Enum):
 
 
 class LocalFileLoaderConfig(BaseConfig):
-    path: str | Path
-    take_rows: int | None = None
+    path: str | Path = Field(description="Path to the file. Must be one of: `csv`, `json`, `parquet`")
+    take_rows: int | None = Field(default=None, description="Number of rows to take from the file.")
     
     @model_validator(mode="after")
     def validate_path(self):

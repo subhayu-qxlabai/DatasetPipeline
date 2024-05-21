@@ -52,6 +52,10 @@ class Messages(BaseModel):
 
     def to_list(self) -> list[dict[str, str]]:
         return self.model_dump(mode="json")["messages"]
+    
+    @classmethod
+    def from_list(cls, messages: list[dict[str, str]]):
+        return cls(messages=[Message(**x) for x in messages])
 
     def __len__(self):
         return len(self.messages)
