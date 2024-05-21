@@ -1,6 +1,6 @@
 load:
     huggingface:
-    -   path: jondurbin/airoboros-3.2
+        path: jondurbin/airoboros-3.2
         split: train
         save: false
         take_rows: 1000
