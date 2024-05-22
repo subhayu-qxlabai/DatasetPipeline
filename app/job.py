@@ -58,11 +58,18 @@ class Job(BaseModel):
     ) -> list[tuple[str, Dataset]]:
         name, dataset = name_and_dataset
         dataset = self.format(dataset, textualize)
-        dataset = self.analyze(dataset)
         dataset = self.dedup(dataset)
         if isinstance(dataset, DatasetDict):
-            return [(f"{name}-{split}", dst) for split, dst in dataset.items()]
-        return [(name, dataset)]
+            name_dataset_map: list[tuple[str, Dataset]] = [
+                (f"{name}-{split}", dst) for split, dst in dataset.items()
+            ]
+        else:
+            name_dataset_map: list[tuple[str, Dataset]] = [(name, dataset)]
+        name_dataset_map = [
+            (name, (self.analyze(d) if "duplicates" not in name else d))
+            for name, d in name_dataset_map
+        ]
+        return name_dataset_map
 
     def run(self) -> list[Path | Dataset]:
         data: dict[str, Dataset] = self.load()
@@ -77,7 +84,7 @@ class Job(BaseModel):
         if errors:
             for name, error in errors:
                 LOGGER.error(f"Error during processing {name!r}: {error}")
-            
+
         data: list[list[tuple[str, Dataset]]] = [
             _data for (_, _), _data in data if not isinstance(_data, Exception)
         ]

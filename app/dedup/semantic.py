@@ -45,8 +45,6 @@ class SemanticDedup(BaseDedup):
         _col = self.dataset[self.config.column]
         if not all(isinstance(x, str) for x in _col):
             return False
-        if len(_col) == len(set(_col)):
-            return False
         return True
 
     def _dedup(self) -> DatasetDict:
