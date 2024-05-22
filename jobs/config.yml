@@ -1,0 +1,197 @@
+load:
+  # Configurations for loading datasets from HuggingFace Hub.
+  huggingface:
+    # Repository path to the dataset. Required.
+    path: davanstrien/data-centric-ml-sft
+    # Name of the dataset configuration. Defaults to `null`.
+    name:
+    # Hugging Face API token. Defaults to `null`.
+    token:
+    # Number of rows to take from the dataset. Defaults to `null`.
+    take_rows:
+    # Split to take from the dataset. Defaults to `null`.
+    split:
+    # Directory to cache the dataset. Defaults to `null`.
+    cache_dir:
+  # Configurations for loading datasets from local file system.
+  local:
+format:
+  # Configuration for merging different columns into 'system', 'user' and 'assistant'
+  merger:
+    system:
+      # List of column names to merge. Defaults to 'null'
+      fields:
+      # Seperator to merge the column. Defaults to ' '
+      separator: ' '
+      # Merged column name.
+      merged_field: system
+    user:
+      # List of column names to merge. Defaults to 'null'
+      fields:
+      - book_id
+      - author
+      - text
+      # Seperator to merge the column. Defaults to ' '
+      separator: "\n"
+      # Merged column name.
+      merged_field: human
+    assistant:
+      # List of column names to merge. Defaults to 'null'
+      fields:
+      # Seperator to merge the column. Defaults to ' '
+      separator: ' '
+      # Merged column name.
+      merged_field: assistant
+    # Whether remove other columns. Defaults to 'False'
+    remove_other_cols: false
+  # Configuration for detecting 'system', 'user' and 'assistant' columns
+  sft:
+    # Whether to use OpenAI to detect 'system', 'user' and 'assistant' columns. Defaults to 'false'
+    use_openai: false
+    # Mapping between column names and role. Roles can be `user` and `assistant`, optionally `system`
+    column_role_map:
+      persona: system
+      human: user
+      summary: assistant
+  # Configuration for detecting 'system', 'user', 'chosen' and 'rejected' columns
+  dpo:
+    # A mapping of column names to role of each column in the dataset. Roles can be `user`, `system`, `chosen` or `rejected`.
+    column_role_map:
+      human: user
+      persona: system
+      positive: chosen
+      negative: rejected
+  # Configuration for detecting and converting conversational object formats. Columns having values like `list[dict[str, str]]`
+  conv: {}
+  # Configuration for detecting and converting conversational text formats.
+  conv_text:
+  # Configuration for converting standardized messages to text format.
+  to_text:
+    system:
+      # Template to apply to the role. Example: `Some text here {value_of_key} Some text here`
+      template: 'SYSTEM: {system}'
+      # The key of the role. Example: `value_of_key`
+      key: system
+    user:
+      # Template to apply to the role. Example: `Some text here {value_of_key} Some text here`
+      template: 'USER: {user}'
+      # The key of the role. Example: `value_of_key`
+      key: user
+    assistant:
+      # Template to apply to the role. Example: `Some text here {value_of_key} Some text here`
+      template: 'ASSISTANT: {assistant}'
+      # The key of the role. Example: `value_of_key`
+      key: assistant
+    # The field name of the individual role. Defaults to 'role'
+    message_role_field: role
+    # The field name of the conversation text for the role. Defaults to 'content'
+    message_content_field: content
+    # The seperator to seperate the conversation texts.
+    separator: "\n\n"
+  # Configuration for outputting the formatted dataset.
+  output:
+    # Whether to only keep the 'messages' column. Defaults to 'False'
+    return_only_messages: true
+deduplicate:
+  # Configuration for semantic deduplication.
+  semantic:
+    # Name of the column to deduplicate. Defaults to 'messages'
+    column: messages
+    # Minimum threshold to consider two messages similar. Defaults to '0.8'
+    threshold: 0.2
+    # Whether to cache the embeddings. Defaults to 'false'
+    cache_embeddings: false
+    # Name of the embedding model to use from huggingface. Defaults to 'sentence-transformers/multi-qa-mpnet-base-dot-v1'
+    embeddings_model: sentence-transformers/multi-qa-mpnet-base-dot-v1
+    # Name of the device to use. Can be one of 'mps', 'cuda', 'npu', 'hpu', 'cpu'. Defaults to 'null'
+    device:
+    # Whether to use multiple processing. Use only when the dataset is too large. Defaults to 'false'
+    multi_process: false
+    # Whether to show the progress of the deduplication status. Defaults to 'true'
+    show_progress: true
+analyze:
+  # Configuration for qualitative analysis.
+  quality:
+    # Name of the column to check the quality. Defaults to 'messages'
+    column_name: messages
+    # List of categories to use. Defaults to 'null'
+    categories:
+    - code
+    - math
+    - job
+    - essay
+    - translation
+    - literature
+    - history
+    - science
+    - medicine
+    - news
+    - finance
+    - geography
+    - philosophy
+    - psychology
+    - education
+    - art
+    - music
+    - technology
+    - environment
+    - food
+    - sports
+    - fashion
+    - travel
+    - culture
+    - language
+    - religion
+    - politics
+    - space
+    - entertainment
+    - healthcare
+    - animals
+    - weather
+    - architecture
+    - automotive
+    - business
+    - comedy
+    - crime
+    - diy
+    - economics
+    - gaming
+    - law
+    - marketing
+    - parenting
+    - science_fiction
+    - social_media
+    - mythology
+    - folklore
+    - astrology
+    - horror
+    - mystery
+    # Example messages to send to OpenAI.
+    example_messages:
+      messages:
+      - role: system
+        content: "You are a helpful assistant who can judge a content and give some
+          metrics on it.\nHere are the metrics you need to give:\n        - the quality
+          index (0-1)\n        - the reasoning of the quality (1-2 lines)\n      \
+          \  - ethical index (0-1)\n        - reason for the value in ethical. (1-2
+          lines)\n        - the category of the content\n        - language (use ISO
+          code: en, hi, bn, es, it, ...)\n\nReturn in JSON format\n"
+      - role: user
+        content: "Text to judge:\nUSER: My password of email account is 'abcde12345'
+          .\nASSISTANT: okay its good but your password is not strong."
+      - role: assistant
+        content: "{\n  \"quality_index\": 0.2,\n  \"quality_reason\": \"The response
+          does not address the privacy risk of sharing passwords and lacks helpful
+          advice on password security.\",\n  \"ethical_index\": 0.0,\n  \"ethical_reason\"\
+          : \"The response fails to caution against sharing passwords publicly, which
+          is a security risk.\",\n  \"category\": \"Digital Security\",\n  \"language\"\
+          : \"en\"\n}"
+save:
+  # Configuration for saving the dataset locally.
+  local:
+    # Directory path to save the dataset. Defaults to 'processed'
+    directory: processed
+    # Filetype to save the dataset. Can be one of 'csv', 'json' or 'parquet'. Defaults to 'parquet'
+    filetype: parquet
+    # Filename to save the dataset. If null auto generates a time based filename and saves in parquet.
+    filename: dataset_20240522183005675759
