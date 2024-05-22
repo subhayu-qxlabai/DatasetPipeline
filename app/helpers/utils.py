@@ -8,6 +8,7 @@ from concurrent import futures
 from typing import Any, Iterable, Callable, MutableMapping, NamedTuple
 
 from fuzzywuzzy import process
+from ruamel.yaml import CommentedMap
 
 
 def safe_getitem(iterable: Iterable, key_or_index: int | str = 0, default: Any = None):
@@ -273,3 +274,25 @@ def parts_from_tsfile(filepath: str | Path) -> dict[str, str | datetime]:
     if match is None:
         return {}
     return match.groupdict() | {"datetime": datetime_from_uid(match.group("uid"))}
+
+
+def add_comments(
+    data: dict, desc_map: dict, parent_key="", desc_key="__desc__"
+):
+    indent_spaces=2
+    commented_map = CommentedMap()
+    for key, value in data.items():
+        full_key = f"{parent_key}.{key}" if parent_key else key
+        subdesc = desc_map.get(key, {})
+        if "__desc__" in subdesc:
+            indent = full_key.count(".") * indent_spaces
+            commented_map.yaml_set_comment_before_after_key(
+                key, before=subdesc["__desc__"], indent=indent
+            )
+        if isinstance(value, dict):
+            commented_map[key] = add_comments(
+                value, subdesc, full_key, desc_key=desc_key
+            )
+        else:
+            commented_map[key] = value
+    return commented_map

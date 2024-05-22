@@ -2,13 +2,11 @@ from typing import Any, get_args, get_origin
 
 from pydantic.fields import FieldInfo
 
-from ..models.base import BaseModel
+from pydantic import BaseModel
 
 
-description_field = "__desc__"
 
-
-def get_field_desc_map(model: BaseModel):
+def get_field_desc_map(model: BaseModel, desc_key="__desc__") -> dict[str, dict[str, dict[str, dict | str] | str]]:
     fields: dict[str, FieldInfo] | Any = getattr(model, "model_fields", None)
     if (
         not fields
@@ -25,7 +23,7 @@ def get_field_desc_map(model: BaseModel):
         types = tuple(
             (x, get_field_desc_map(x)) for x in types if hasattr(x, "model_fields")
         )
-        fields_dict = {description_field: field_info.description}
+        fields_dict = {desc_key: field_info.description}
         for k, v in types:
             if k is not None:
                 fields_dict.update(v)

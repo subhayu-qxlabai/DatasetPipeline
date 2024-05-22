@@ -1,14 +1,20 @@
 import json
-import yaml
+from io import StringIO
 from pathlib import Path
 from typing import Any, Literal
 
+from ruamel.yaml import YAML
 from pydantic.main import IncEx
 from pydantic import BaseModel as PydanticBaseModel
 
-from ..helpers.utils import clean_json_str, clean_yaml_str, find_best_match
+from ..helpers.models import get_field_desc_map
+from ..helpers.utils import add_comments, clean_json_str, clean_yaml_str, find_best_match
+
 
 PathLike = str | Path
+
+yaml = YAML()
+
 
 class BaseModel(PydanticBaseModel):
     def __str__(self):
@@ -73,7 +79,8 @@ class BaseModel(PydanticBaseModel):
         Returns:
             BaseModel: The created BaseModel object.
         """
-        return cls.from_dict(yaml.safe_load(clean_yaml_str(data)), fuzzy)
+        data = clean_yaml_str(data)
+        return cls.from_dict(yaml.load(StringIO(data)), fuzzy)
     
     @classmethod
     def from_file(cls, path: PathLike, fuzzy=False, cutoff: float = 0.0):
@@ -200,9 +207,9 @@ class BaseModel(PydanticBaseModel):
         return json.dumps(d, indent=indent, sort_keys=sort_keys)
     
     def to_yaml(
-        self, 
+        self,
         indent=4, 
-        sort_keys=False, 
+        sort_keys=False,
         include: IncEx = None,
         exclude: IncEx = None,
         context: dict[str, Any] | None = None,
@@ -248,7 +255,11 @@ class BaseModel(PydanticBaseModel):
             warnings=warnings,
             serialize_as_any=serialize_as_any,
         )
-        return yaml.safe_dump(d, indent=indent, sort_keys=sort_keys)
+        f = get_field_desc_map(self)
+        d = add_comments(d, f)
+        buffer = StringIO()
+        yaml.dump(d, buffer)
+        return buffer.getvalue()
     
     def to_file(
         self, 
