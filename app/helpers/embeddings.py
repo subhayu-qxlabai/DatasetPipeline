@@ -1,92 +1,82 @@
 import pickle
-from pathlib import Path
+import hashlib
+from typing import List
 from dataclasses import dataclass
+
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import create_engine, Column, String, LargeBinary
 
 from langchain_core.embeddings import Embeddings as LCEmbeddings
 from langchain_community.embeddings.huggingface import HuggingFaceEmbeddings
 
-from .utils import hash_uuid
-
+Base = declarative_base()
 
 GET_DEFAULT_EMBEDDINGS = lambda: HuggingFaceEmbeddings(
     model_name="sentence-transformers/multi-qa-mpnet-base-dot-v1",
     model_kwargs={"device": "cpu"},
-    show_progress=False,
+    show_progress=False,                        
 )
 
+class EmbeddingRecord(Base):
+    __tablename__ = "embeddings"
+    text_hash = Column(String, primary_key=True)
+    embedding = Column(LargeBinary)
 
 @dataclass
 class Embeddings:
     model: LCEmbeddings = None
     use_cache: bool = True
-    embeddings_directory: Path = "embeddings"
+    database_url: str = "sqlite:///embeddings.db"
 
     def __post_init__(self):
         if self.model is None:
             self.model = GET_DEFAULT_EMBEDDINGS()
-        self.filename_suffix = ".hash"
-        self.embeddings_directory = Path(self.embeddings_directory)
-        self.embeddings_directory.mkdir(parents=True, exist_ok=True)
+        self.engine = create_engine(self.database_url)
+        Base.metadata.create_all(self.engine)
+        self.Session = sessionmaker(bind=self.engine)
+    
+    def hash_text(self, text: str) -> str:
+        return hashlib.sha256((self.model.model_name + text).encode('utf-8')).hexdigest()
+
+    def get_embedding_from_db(self, text_hash: str):
+        session = self.Session()
+        result = session.query(EmbeddingRecord).filter_by(text_hash=text_hash).first()
+        session.close()
+        if result:
+            return pickle.loads(result.embedding)
+        return None
+
+    def _save_embedding_to_db(self, text_hash: str, embedding: List[float]):
+        session = self.Session()
+        binary_embedding = pickle.dumps(embedding)
+        record = EmbeddingRecord(text_hash=text_hash, embedding=binary_embedding)
+        session.merge(record)  # insert or update
+        session.commit()
+        session.close()
+
+    def _embed_documents_with_caching(self, texts: List[str]):
+        text_hashes = {text: self.hash_text(text) for text in texts}
         
-    def hash_text(self, text: str):
-        return hash_uuid(self.model.model_name + text)
+        cached_embeddings = {}
+        uncached_texts = []
 
-    def get_file_path(self, text: str):
-        return (
-            self.embeddings_directory / f"{self.hash_text(text).hex}{self.filename_suffix}"
-        )
+        for text, text_hash in text_hashes.items():
+            embedding = self.get_embedding_from_db(text_hash)
+            if embedding is not None:
+                cached_embeddings[text] = embedding
+            else:
+                uncached_texts.append(text)
 
-    def embed_documents_with_caching(self, texts: list[str]):
-        text_file_map = {x: self.get_file_path(x) for x in texts}
-        file_text_map = {file: text for text, file in text_file_map.items()}
-        text_filename_map = {text: file.name for file, text in file_text_map.items()}
+        generated_embeddings = self.model.embed_documents(uncached_texts)
+        
+        for text, embedding in zip(uncached_texts, generated_embeddings):
+            self._save_embedding_to_db(text_hashes[text], embedding)
+            cached_embeddings[text] = embedding
 
-        filenames = [x.name for x in file_text_map]
+        return [cached_embeddings[text] for text in texts]
 
-        cached_files: list[Path] = [
-            x
-            for x in self.embeddings_directory.glob(f"*{self.filename_suffix}")
-            if x.name in filenames
-        ]
-        del filenames
-
-        relevant_filenames = [x.name for x in cached_files]
-        cached_filename_embedding_map: dict[str, list[float]] = {
-            x.name: pickle.load(x.open("rb")) for x in cached_files
-        }
-
-        uncached_file_text_map = {
-            file: text
-            for file, text in file_text_map.items()
-            if file.name not in relevant_filenames
-        }
-
-        del relevant_filenames, cached_files
-
-        generated_embeddings = self.model.embed_documents(
-            list(uncached_file_text_map.values())
-        )
-        generated_filename_embedding_map = {
-            path.name: embedding
-            for path, embedding in zip(uncached_file_text_map, generated_embeddings)
-        }
-        for path, embedding in zip(uncached_file_text_map, generated_embeddings):
-            pickle.dump(embedding, path.open("wb"))
-        all_filename_embeddings = {
-            **cached_filename_embedding_map,
-            **generated_filename_embedding_map,
-        }
-        del (
-            cached_filename_embedding_map,
-            generated_filename_embedding_map,
-            uncached_file_text_map,
-        )
-        all_text_embeddings = [
-            (text, all_filename_embeddings[text_filename_map[text]]) for text in texts
-        ]
-        return [embeddings for text, embeddings in all_text_embeddings]
-
-    def embed_documents(self, texts: list[str]) -> list[list[float]]:
+    def embed_documents(self, texts: List[str]) -> List[List[float]]:
         if self.use_cache:
-            return self.embed_documents_with_caching(texts)
+            return self._embed_documents_with_caching(texts)
         return self.model.embed_documents(texts)
