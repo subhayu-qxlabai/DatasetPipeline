@@ -1,3 +1,40 @@
+"""
+This module provides the `DPOFormat` class for handling datasets in the DPO (Dialogue Prompt Optimization) format.
+
+The `DPOFormat` class is a subclass of `BaseFormat` and is designed to handle datasets in the DPO format. It provides methods for formatting the dataset by converting the columns into messages and adding them to the dataset.
+
+The class has the following main components:
+
+- `__init__(self, dataset: Dataset, config: DPOConfig = DPOConfig())`: Initializes the class with a dataset and a configuration object. It sets up the `pattern_role_map` and `col_map` attributes by calling the `_get_col_map` method.
+
+- `_get_col_map(self)`: Creates a dictionary mapping column names to their corresponding roles based on a pattern-role mapping provided in the configuration.
+
+- `is_this_format(self) -> bool`: Checks if the dataset has at least two columns and if it has both `CHOSEN` and `REJECTED` columns.
+
+- `_convert_row_to_messages(self, row: dict[str, Any], assistant_col: DPOColumns = DPOColumns.CHOSEN)`: Converts a row of the dataset into a list of messages based on the column roles.
+
+- `_convert_chosen_rejected_to_messages(self, row: dict[str, Any])`: Converts the `CHOSEN` and `REJECTED` columns of a row into separate messages.
+
+- `format(self) -> Dataset`: Formats the dataset by converting the `CHOSEN` and `REJECTED` columns into messages. If the dataset is not in the DPO format, it returns the original dataset.
+
+Example usage:
+
+```python
+from datasets import Dataset
+from dpo_format import DPOFormat, DPOConfig
+
+# Create a dataset and configuration object
+dataset = Dataset(...)
+config = DPOConfig(...)
+
+# Initialize the DPOFormat class
+dpo_format = DPOFormat(dataset, config)
+
+# Format the dataset
+formatted_dataset = dpo_format.format()
+```
+"""
+
 from typing import Any
 
 from datasets import Dataset

@@ -1,3 +1,35 @@
+"""
+This module contains the implementation of the SFTFormat class, which is a subclass of BaseFormat.
+
+SFTFormat is used to format a dataset into the standard format. It detects 'system', 'user', and 'assistant' columns in the dataset.
+
+Classes:
+    SFTFormat(BaseFormat): The class for formatting a dataset into the standard format.
+
+Attributes:
+    PATTERN_ROLE_MAP (dict): A mapping between column names and their corresponding roles.
+
+Functions:
+    _get_role_col_map(self) -> dict: Returns a dictionary mapping roles to column names.
+    is_this_format(self) -> bool: Returns True if the dataset has 'system', 'user', and 'assistant' columns, otherwise False.
+    _make_messages(self, data: dict[str, str]) -> list[dict[str, str]]: Returns a list of messages in the standard format.
+    format(self) -> Dataset: Formats the dataset into the standard format.
+
+```python
+from datasets import Dataset
+from sft import SFTFormat, SFTConfig
+
+# Create a dataset
+dataset = Dataset(...)
+
+# Create an instance of SFTFormat
+config = SFTConfig(...)
+sft_format = SFTFormat(dataset, config)
+
+# Format a dataset
+dataset = sft_format.format()
+```
+"""
 import json
 
 from datasets import Dataset
