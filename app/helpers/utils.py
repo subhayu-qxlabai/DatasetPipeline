@@ -1,3 +1,67 @@
+"""
+This module provides utility functions for various purposes.
+
+Functions:
+    get_ts_filename(filename: str) -> str:
+        Extracts the timestamp and filename from a given string.
+
+    datetime_from_uid(uid: str) -> datetime:
+        Converts a UID string to a datetime object.
+
+    parse_ts_filename(filename: str) -> dict:
+        Parses a filename and extracts the timestamp and suffix.
+
+    add_comments(data: dict, desc_map: dict, parent_key="", desc_key="__desc__") -> CommentedMap:
+        Adds comments to a dictionary based on a description map.
+
+    run_parallel(exec_func: Callable, iterable: Iterable, *func_args, **kwargs) -> list:
+        Runs a function in parallel for each element in an iterable.
+
+    remove_backticks(text: str) -> str:
+        Removes backticks from a string.
+
+    remove_comments(text: str) -> str:
+        Removes single-line comments from a string.
+
+    clean_json_str(text: str) -> str:
+        Cleans a JSON string by removing backticks and single-line comments.
+
+    clean_yaml_str(text: str) -> str:
+        Cleans a YAML string by removing backticks.
+
+    find_best_match(query: str, options: list[str], cutoff: int = 0) -> Match:
+        Finds the best match for a query string in a list of options.
+
+Classes:
+    Match(NamedTuple):
+        Represents a match with a text and a score.
+
+Example Usage:
+    >>> from app.helpers.utils import get_ts_filename, datetime_from_uid, parse_ts_filename, add_comments, Match
+
+    >>> filename = "my_file_20220101_123456_7890.txt"
+    >>> get_ts_filename(filename)
+    ('20220101_123456_7890', 'my_file.txt')
+
+    >>> uid = "20220101_123456_7890"
+    >>> datetime_from_uid(uid)
+    datetime.datetime(2022, 1, 1, 12, 34, 56)
+
+    >>> parse_ts_filename("my_file_20220101_123456_7890.txt")
+    {'stem': 'my_file', 'uid': '20220101_123456_7890', 'suffix': '.txt', 'datetime': datetime.datetime(2022, 1, 1, 12, 34, 56)}
+
+    >>> data = {"key1": {"subkey1": "value1"}, "key2": "value2"}
+    >>> desc_map = {"key1": {"subkey1": "This is subkey1"}, "key2": "This is key2"}
+    >>> add_comments(data, desc_map)
+    CommentedMap({'key1': CommentedMap({'subkey1': 'value1'}), 'key2': 'value2'})
+
+    >>> query = "apple"
+    >>> options = ["banana", "orange", "apple"]
+    >>> match = find_best_match(query, options)
+    >>> match
+    Match(text='apple', score=1.0)
+"""
+
 import re
 import uuid
 import traceback

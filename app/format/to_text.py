@@ -1,3 +1,32 @@
+"""
+This module provides the `ToTextFormat` class for converting a dataset with one or multiple columns of conversational data to text format specified by the `config`.
+
+Example Usage:
+
+```python
+from datasets import Dataset
+from dedup.to_text import ToTextConfig, ToTextFormat
+
+# Create a dataset
+dataset = Dataset.from_csv('data.csv')
+
+# Create a configuration object
+config = ToTextConfig(
+    column='conversation_column',
+    # Add any other configuration options here
+)
+
+# Create a ToTextFormat object
+formatter = ToTextFormat(dataset, config)
+
+# Perform the conversion
+converted_dataset = formatter.format()
+
+# Print the converted dataset
+print(converted_dataset)
+```
+"""
+
 from datasets import Dataset
 
 from .base import BaseFormat, BaseConfig

@@ -1,3 +1,14 @@
+"""
+This module defines the base classes for loading datasets.
+
+Classes:
+    BaseConfig: An empty base configuration model.
+    BaseLoader: An abstract base class for loading datasets.
+
+Usage:
+    To use this module, you can create a subclass of `BaseLoader` and implement the `_load` method.
+"""
+
 from abc import ABC, abstractmethod
 
 from datasets import Dataset, DatasetDict

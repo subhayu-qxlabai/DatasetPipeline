@@ -1,3 +1,43 @@
+"""
+Converts conversational data to the standard format.
+
+This module provides functionality for converting one or multiple columns of conversational data to the standard format, irrespective of the current format. It defines the `ConvConfig` class and the `ConversationalFormat` class.
+
+The `ConvConfig` class is a subclass of `BaseConfig` and currently does not have any additional functionality.
+
+The `ConversationalFormat` class is responsible for converting the conversational data. It takes a `Dataset` object and a `ConvConfig` object as input. It initializes the `BaseFormat` class with the given dataset and config. It also has a `conv_props` attribute that stores a list of `ConvProps` objects.
+
+The `ConversationalFormat` class has several methods:
+- `get_conv_props`: Retrieves the `ConvProps` objects for each column in the dataset.
+- `_get_conv_prop`: Retrieves the role key, content key, and other properties for a given `ConvProps` object.
+- `_get_role_and_content_key`: Determines the role key and content key based on the given conversation dataframe.
+- `_get_conv_roles`: Retrieves the roles mapping for a given `ConvProps` object.
+- `is_this_format`: Checks if any of the `ConvProps` objects are valid.
+- `_format`: Formats the dataset by standardizing the conversational data.
+
+Example usage:
+
+```python
+from conversational_format import ConversationalFormat, ConvConfig
+from datasets import Dataset
+
+# Create a Dataset object
+dataset = Dataset.from_pandas(pd.DataFrame({'messages': [['Hello', 'How are you?']]}))
+
+# Create a ConvConfig object (optional)
+config = ConvConfig()
+
+# Create a ConversationalFormat object
+conversational_format = ConversationalFormat(dataset, config)
+
+# Check if the conversational format is valid
+is_valid = conversational_format.is_this_format
+
+# Format the dataset
+formatted_dataset = conversational_format._format()
+```     
+"""
+
 from warnings import warn
 from itertools import chain
 

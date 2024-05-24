@@ -1,3 +1,49 @@
+"""
+This module provides the base classes and functions for analyzing datasets.
+
+Classes:
+    BaseConfig: The base configuration class for analyzers.
+    BaseAnalyzer: The base analyzer class that defines the interface for dataset analyzers.
+
+Methods:
+    __init__(self, dataset: Dataset, config=BaseConfig()):
+        Initializes the BaseAnalyzer object with the given dataset and configuration.
+
+    has_config(self) -> bool:
+        Property that returns a boolean indicating whether the analyzer has a configuration.
+
+    name(self) -> str:
+        Method that returns the name of the analyzer.
+
+    _analyze(self) -> Dataset:
+        Abstract method that returns a Dataset object with the analyzed fields.
+
+    analyze(self) -> Dataset:
+        Method that returns a Dataset object with the analyzed fields. If the analyzer has a configuration, it performs the analysis. Otherwise, it returns the original dataset.
+
+    __or__(self, cls: type["BaseAnalyzer"]) -> BaseAnalyzer:
+        Operator overload for chaining analyzers. Creates a new instance of the given class with the analyzed dataset and appends the name of the current analyzer to the list of analyzers.
+
+Example Usage:
+    from datasets import Dataset
+    from .base import BaseAnalyzer, BaseConfig
+
+    class MyConfig(BaseConfig):
+        pass
+        
+    class MyAnalyzer(BaseAnalyzer):
+        def _analyze(self) -> Dataset:
+            # Analyze the dataset and return a new dataset with analyzed fields
+            pass
+
+    dataset = Dataset.from_pandas(...)
+    config = MyConfig()
+    analyzer = MyAnalyzer(dataset, config)
+    analyzed_dataset = analyzer.analyze()
+
+
+"""
+
 from abc import ABC, abstractmethod
 
 from datasets import Dataset

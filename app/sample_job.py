@@ -1,3 +1,17 @@
+"""
+This module defines a configuration for a job that loads a dataset from the Hugging Face dataset repository, formats the dataset, deduplicates it, analyzes its quality, and saves it to a local directory as a Parquet file.
+
+The configuration is defined in the `config` variable, which is an instance of `JobConfig`.
+
+Example usage:
+
+```python
+if __name__ == "__main__":
+    job = Job(config)
+    pprint(job.to_yaml())
+```
+"""
+
 from pprint import pprint
 from .job import Job, JobConfig
 from .loader import LoaderConfig, HFLoaderConfig

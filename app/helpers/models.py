@@ -7,6 +7,38 @@ from pydantic import BaseModel
 
 
 def get_field_desc_map(model: BaseModel, desc_key="__desc__") -> dict[str, dict[str, dict[str, dict | str] | str]]:
+    """
+    Generate a dictionary that maps field names to their descriptions and nested field descriptions.
+
+    Args:
+        model (BaseModel): The model to extract field descriptions from.
+        desc_key (str, optional): The key to use for the field descriptions. Defaults to "__desc__".
+
+    Returns:
+        dict[str, dict[str, dict[str, dict | str] | str]]: A dictionary where the keys are field names and the values
+            are dictionaries containing the field descriptions and nested field descriptions.
+
+    Example:
+        >>> class MyModel(BaseModel):
+        ...     field1: str = Field(description="Description for field1")
+        ...     field2: int = Field(description="Description for field2")
+        ...     nested_field: NestedModel = Field(description="Description for nested_field")
+        ...
+        >>> class NestedModel(BaseModel):
+        ...     nested_field1: str = Field(description="Description for nested_field1")
+        ...     nested_field2: int = Field(description="Description for nested_field2")
+        ...
+        >>> get_field_desc_map(MyModel())
+        {
+            'field1': {'__desc__': 'Description for field1'},
+            'field2': {'__desc__': 'Description for field2'},
+            'nested_field': {
+                '__desc__': 'Description for nested_field',
+                'nested_field1': {'__desc__': 'Description for nested_field1'},
+                'nested_field2': {'__desc__': 'Description for nested_field2'}
+            }
+        }
+    """
     fields: dict[str, FieldInfo] | Any = getattr(model, "model_fields", None)
     if (
         not fields

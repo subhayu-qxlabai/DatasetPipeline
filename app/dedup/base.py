@@ -1,3 +1,31 @@
+"""
+This module provides classes and functions for deduplicating datasets.
+
+Classes:
+    BaseConfig: A configuration class for the deduplicator.
+    BaseDedup: An abstract base class for deduplicating datasets.
+
+Functions:
+    get_empty_dataset: Returns an empty dataset with the given column names.
+
+Usage Example:
+    from base import BaseConfig, BaseDedup
+
+    # Create a dataset
+    dataset = Dataset.from_dict({'column1': [1, 2, 3], 'column2': [4, 5, 6]})
+
+    # Create a deduplicator with a config
+    config = BaseConfig()
+    deduplicator = BaseDedup(dataset, config)
+
+    # Perform deduplication
+    deduplicated_dataset = deduplicator.dedup()
+
+    # Access the deduplicated and duplicate datasets
+    deduplicated = deduplicated_dataset['deduplicated']
+    duplicates = deduplicated_dataset['duplicates']
+"""
+
 from abc import ABC, abstractmethod
 
 from datasets import Dataset, DatasetDict

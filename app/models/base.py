@@ -1,3 +1,57 @@
+"""
+BaseModel: An abstract base class for all models in the app.
+
+This module provides the `BaseModel` class, which serves as an abstract base class for all models in the app. It provides common functionality for all models, such as loading from JSON or YAML, saving to JSON or YAML, and equality comparison.
+
+Methods:
+    from_json(data: str, fuzzy=False, cutoff: float = 0.0) -> BaseModel:
+        Creates a BaseModel object from a JSON string.
+
+    from_yaml(data: str, fuzzy=False, cutoff: float = 0.0) -> BaseModel:
+        Creates a BaseModel object from a YAML string.
+
+    to_json(include=None, exclude=None, by_alias=False, skip_defaults=False, exclude_unset=False, exclude_defaults=False, exclude_none=False, encoder=None, use_enum_values=False, encoder_options=None, json_dumps_params=None) -> str:
+        Saves the BaseModel object to a JSON string.
+
+    to_yaml(include=None, exclude=None, by_alias=False, exclude_unset=False, exclude_defaults=False, exclude_none=False, encoder=None, use_enum_values=False, encoder_options=None, yaml_dumps_params=None) -> str:
+        Saves the BaseModel object to a YAML string.
+
+    save(path: Union[str, Path], include=None, exclude=None, by_alias=False, skip_defaults=False, exclude_unset=False, exclude_defaults=False, exclude_none=False, round_trip=False, warnings=True, serialize_as_any=False) -> None:
+        Saves the BaseModel object to a file.
+
+    __hash__(self) -> int:
+        Returns the hash of the BaseModel object.
+
+    __eq__(self, other: "BaseModel") -> bool:
+        Compares the BaseModel object for equality with another BaseModel object.
+
+Usage Examples:
+    # Creating a BaseModel object from JSON
+    data = '{"name": "John", "age": 30}'
+    person = BaseModel.from_json(data)
+
+    # Creating a BaseModel object from YAML
+    data = 'name: John\nage: 30'
+    person = BaseModel.from_yaml(data)
+
+    # Saving a BaseModel object to JSON
+    person = BaseModel(name="John", age=30)
+    json_data = person.to_json()
+
+    # Saving a BaseModel object to YAML
+    person = BaseModel(name="John", age=30)
+    yaml_data = person.to_yaml()
+
+    # Comparing two BaseModel objects for equality
+    person1 = BaseModel(name="John", age=30)
+    person2 = BaseModel(name="John", age=30)
+    is_equal = person1 == person2
+
+    # Saving a BaseModel object to a file
+    person = BaseModel(name="John", age=30)
+    person.save("person.yaml")
+"""
+
 import json
 from io import StringIO
 from pathlib import Path

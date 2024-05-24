@@ -1,4 +1,30 @@
-"""Merges multiple columns of a dataset into a single columns for the system, user and assistant."""
+"""
+In this module it provides a class called MergerFormat which merges multiple columns of a dataset into a single column for the system, user, and assistant.
+
+Usage example:
+```
+dataset = Dataset(...)
+config = MergerConfig(...)
+merger_format = MergerFormat(dataset, config)
+merged_dataset = merger_format.format()
+```
+
+Args:
+    dataset (Dataset): The dataset to be merged.
+    config (MergerConfig, optional): The configuration for merging. Defaults to MergerConfig().
+
+Attributes:
+    config (MergerConfig): The merged configuration.
+
+Methods:
+    config_fields: Returns a set of field names to be merged.
+    is_this_format: Checks if the dataset can be merged.
+    _merge_field_vals: Merges the values of multiple fields into a single field.
+    _apply_field_config: Applies the field configuration to the dataset.
+    _apply_field_configs: Applies multiple field configurations to the dataset.
+    _format: Merges the columns of the dataset based on the configuration.
+
+"""
 
 from typing import Any
 from datasets import Dataset

@@ -1,3 +1,14 @@
+"""
+This module contains helper functions for type checking.
+
+Functions:
+    is_conv_type(value): Checks if value is of type `list[dict[str, str]]`, where each `dict` has 2 or 3 items.
+    is_standard_type(value): Checks if value is of type `list[dict[str, str]]`, where each `dict` has exactly 2 items, has `role` and `content` keys, and the `role` value is one of `Role.SYSTEM`, `Role.USER`, or `Role.ASSISTANT`.
+
+Usage Example:
+    from app.helpers.types import is_conv_type, is_standard_type
+"""
+
 from typing import Iterable
 from ..constants import MessageField as Field, MessageRole as Role
 

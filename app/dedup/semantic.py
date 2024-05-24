@@ -1,3 +1,36 @@
+"""
+This module provides functionality for semantic deduplication using Hugging Face embeddings.
+
+The module defines two classes:
+
+- `SemanticDedupConfig`: A Pydantic model that defines the configuration options for semantic deduplication.
+- `SemanticDedup`: A class that performs semantic deduplication on a dataset.
+
+Example Usage:
+
+```python
+from datasets import Dataset
+from semantic import SemanticDedup, SemanticDedupConfig
+
+# Create a dataset
+dataset = Dataset.from_pandas(pd.DataFrame({"messages": ["Hello", "World"]}))
+
+# Create a configuration object
+config = SemanticDedupConfig(column="messages", threshold=0.8, embeddings_model="sentence-transformers/multi-qa-mpnet-base-dot-v1")
+
+# Create an instance of SemanticDedup
+deduplicator = SemanticDedup(dataset, config)
+
+# Perform semantic deduplication
+deduplicated_dataset = deduplicator.dedup()
+
+# Access the deduplicated dataset
+print(deduplicated_dataset.deduplicated)
+print(deduplicated_dataset.duplicates)
+```
+
+"""
+
 from typing import Any, Literal
 from functools import cached_property
 

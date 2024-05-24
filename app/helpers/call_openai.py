@@ -160,6 +160,31 @@ def call_openai_api(
     n: int = 1,
     logger: Callable[[str, str], None] = LOGGER.log,
 ):
+    """
+    Call the OpenAI API to generate text based on the given messages.
+    Args:
+        messages (list[dict[str, str]]): A list of dictionaries representing the conversation messages.
+        temperature (float, optional): The temperature parameter for text generation. Defaults to 0.7.
+        n (int, optional): The number of text generation samples to generate. Defaults to 1.
+        logger (Callable[[str, str], None], optional): A logger function to log debug and info messages. Defaults to LOGGER.log.
+    Returns:
+        The response from the OpenAI API.
+    Raises:
+        Exception: If the OpenAI API call fails or the response is filtered.
+    Notes:
+        - The OpenAI API is called using the selected GPT-4 key.
+        - The OpenAI API version used is "2023-12-01-preview".
+        - The OpenAI API key and base are set based on the selected GPT-4 key.
+        - If the OpenAI API call fails due to rate limiting, the function retries after sleeping for the rate limit duration plus 60 seconds.
+    Example:
+        messages = [
+            {"role": "user", "content": "What is the capital of France?"},
+            {"role": "assistant", "content": "Paris"},
+        ]
+        response = call_openai_api(messages)
+        print(response.choices[0].message.content)
+    """
+    
     llm_api = choosed_gpt4_key()["api"]
     # print(f"API: {llm_api}")
 
