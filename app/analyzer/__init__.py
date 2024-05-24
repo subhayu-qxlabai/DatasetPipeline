@@ -1,3 +1,18 @@
+"""
+This module contains the `__init__.py` file for the `analyzer` package.
+
+It imports and exports the necessary classes and functions for analyzing datasets.
+
+Submodules:
+- `base`: Contains the base classes for analyzing datasets.
+- `quality`: Contains the classes for analyzing the quality of text data.
+- `output`: Contains the classes for analyzing the output of text data.
+
+Classes:
+- `BaseAnalyzer`: The base class for analyzing datasets.
+- `QualityAnalyzer`: The class for analyzing the quality of text data.
+- `OutputAnalyzer`: The class for analyzing the output of text data.
+"""
 from functools import partial
 from dataclasses import dataclass
 

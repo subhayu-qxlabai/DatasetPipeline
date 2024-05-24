@@ -1,3 +1,17 @@
+"""
+This module contains the `__init__.py` file for the `loader` package.
+
+It imports and exports the necessary classes and functions for loading datasets.
+
+Submodules:
+- `base`: Contains the base classes for creating loader classes.
+- `huggingface`: Contains the classes for loading datasets from HuggingFace Hub.
+- `local_file`: Contains the classes for loading datasets from the local file system.
+
+Classes:
+- `LoaderConfig`: The configuration for loading datasets.
+- `Loader`: The class for loading datasets.
+"""
 from dataclasses import dataclass
 
 from datasets import Dataset, DatasetDict

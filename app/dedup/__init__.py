@@ -1,3 +1,15 @@
+"""
+This module provides the main entry point for the deduplication functionality of the DatasetPipeline.
+
+It contains the main classes and functions for deduplication, including:
+
+- `BaseDedup` and `BaseConfig`: Base classes for deduplication functionality.
+- `BaseModel`: Base class for deduplication models.
+- `SemanticDedup` and `SemanticDedupConfig`: Classes and configuration for semantic deduplication.
+- `Dedup` and `DedupConfig`: Class for deduplicating datasets and configuration.
+
+To use this module, import the `Dedup` class and create a `DedupConfig` object. For example:
+"""
 from functools import partial
 from dataclasses import dataclass
 

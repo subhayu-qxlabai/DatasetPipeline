@@ -1,3 +1,12 @@
+"""
+This module contains the `Saver` class and its configuration class `SaverConfig`. 
+
+The `Saver` class is responsible for saving a `Dataset` object to different storage formats. It currently supports saving to a local directory.
+
+The `SaverConfig` class is a pydantic model that defines the configuration for the `Saver` class. It has a single field `local`, which is an instance of `LocalSaverConfig`.
+
+"""
+
 from dataclasses import dataclass
 
 from datasets import Dataset

@@ -1,3 +1,37 @@
+"""
+This module provides a set of classes for formatting datasets into the standard format.
+
+The standard format is a dataset with a column in the following form:
+
+```python
+[
+    {
+        "role": "system",
+        "content": "System message"
+    },
+    {
+        "role": "user",
+        "content": "User input"
+    },
+    {
+        "role": "assistant",
+        "content": "Assistant output"
+    }
+]
+```
+
+The module provides the following classes:
+
+- `Format`: The base class for formatting datasets into the standard format.
+- `MergerFormat`: Merges multiple columns of a dataset into a single columns for the system, user and assistant.
+- `ConversationalFormat`: Converts one or multiple columns of conversational data to the standard format, irrespective of the current format.
+- `ConversationalTextFormat`: Converts a dataset having columns with conversation between between 2-3 entities in text format to a standard conversational format having system, user and assistant.
+- `ToTextFormat`: Converts a dataset with one or multiple columns of conversational data to text format specified by the `config`.
+- `SFTFormat`: Converts a dataset with one or multiple columns of conversational data in SFT format to the standard format.
+- `DPOFormat`: Converts a dataset with one or multiple columns of conversational data in DPO format to the standard format.
+- `OutputFormat`: Converts a dataset into the specified output format.
+"""
+
 from enum import Enum, auto
 from functools import partial
 from dataclasses import dataclass
@@ -104,4 +138,3 @@ class Format:
         if not textualize:
             return chain.format()
         return (chain | self.to_text).format()
-    
