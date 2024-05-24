@@ -1,3 +1,48 @@
+"""
+This module defines classes for messages in a chat application.
+
+Classes:
+    Message: Base class for messages with `role` and `content` attributes.
+    SystemMessage: Subclass of `Message` with `role` set to "system".
+    UserMessage: Subclass of `Message` with `role` set to "user".
+    AssistantMessage: Subclass of `Message` with `role` set to "assistant".
+    Messages: Container class for a list of `Message` objects.
+
+Usage Example:
+
+    from app.models.messages import Message, SystemMessage, UserMessage, AssistantMessage, Messages
+
+    # Create a list of messages
+    messages = [
+        SystemMessage(content="Welcome to the chat!"),
+        UserMessage(content="Hello!"),
+        AssistantMessage(content="Hi there!"),
+    ]
+
+    # Create a `Messages` object from the list of messages
+    messages_obj = Messages(messages=messages)
+
+    # Get the number of messages
+    num_messages = len(messages_obj)
+
+    # Access individual messages by index
+    first_message = messages_obj[0]
+
+    # Iterate over all messages
+    for message in messages_obj:
+        print(message.content)
+
+    # Check if a message is in the `Messages` object
+    if UserMessage(content="Hello!") in messages_obj:
+        print("Message found!")
+
+    # Get the hash of the messages
+    messages_hash = hash(messages_obj)
+
+    # Get the JSON representation of the messages
+    messages_json = messages_obj.model_dump_json()
+"""
+
 import json
 
 from pydantic import model_validator

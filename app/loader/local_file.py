@@ -1,3 +1,33 @@
+"""
+Module for loading datasets from local files.
+
+This module provides a `LocalFileLoader` class that is used to load datasets from local files. It follows a Pydantic-based configuration model, where the `LocalFileLoaderConfig` class defines the parameters for loading a dataset from a local file.
+
+The `LocalFileLoaderConfig` class has two fields:
+- `path`: Specifies the path to the file. Must be one of: `csv`, `json`, `parquet`.
+- `take_rows`: Specifies the number of rows to take from the file. Defaults to `None`.
+
+The `validate_path` method is a validator that checks if the specified path exists and is a file, and if the file type is one of the allowed types (`csv`, `json`, or `parquet`).
+
+The `LocalFileLoader` class has an `__init__` method that initializes the loader with a `LocalFileLoaderConfig` object. It also has a `_load` method that loads the dataset from the specified file using the `datasets` library. The file type is determined based on the file extension, and the appropriate loader method is called. The loaded dataset is returned as a `DatasetDict`.
+
+Example usage:
+
+```python
+from datasets import DatasetDict
+from app.loader.local_file import LocalFileLoader, LocalFileLoaderConfig
+
+# Create a LocalFileLoaderConfig object
+config = LocalFileLoaderConfig(path="path/to/file.csv", take_rows=10)
+
+# Create a LocalFileLoader object
+loader = LocalFileLoader(config)
+
+# Load the dataset
+dataset_dict: DatasetDict = loader.load()
+```
+"""
+
 from enum import Enum
 from pathlib import Path
 

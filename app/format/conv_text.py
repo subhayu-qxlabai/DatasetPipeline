@@ -1,3 +1,32 @@
+"""
+This module provides the `ConvTextFormat` class for converting a dataset with one or multiple columns of conversational data to a standard conversational format having system, user, and assistant.
+
+Example Usage:
+
+```python
+from datasets import Dataset
+from dedup.conv_text import ConvTextConfig, ConvTextFormat
+
+# Create a dataset
+dataset = Dataset.from_csv('data.csv')
+
+# Create a configuration object
+config = ConvTextConfig(
+    column='conversation_column',
+    # Add any other configuration options here
+)
+
+# Create a ConvTextFormat object
+formatter = ConvTextFormat(dataset, config)
+
+# Perform the conversion
+converted_dataset = formatter.format()
+
+# Print the converted dataset
+print(converted_dataset)
+```
+"""
+
 from datasets import Dataset
 
 from pydantic import Field

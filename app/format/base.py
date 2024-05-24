@@ -1,3 +1,40 @@
+"""
+This module provides the `BaseConfig` and `BaseFormat` classes for formatting datasets.
+
+`BaseConfig` is a subclass of `BaseModel` and serves as an empty configuration model.
+
+`BaseFormat` is an abstract base class for formatting datasets. It has an initializer that takes a `Dataset` object and an optional `BaseConfig` object. It also has several properties and methods:
+
+- `has_config`: A boolean property indicating whether the format has a config.
+- `format_class`: A property returning the class of the format.
+- `format_name`: A property returning the name of the format.
+- `is_this_format`: A boolean property indicating whether the format is this format.
+- `_format`: An abstract method that returns a `Dataset` object representing the messages.
+- `format`: A method that returns a `Dataset` object with the formatted fields.
+- `get_conv_columns`: A method returning a list of columns that have a conversion type.
+- `get_standard_columns`: A method returning a list of columns that have a standard type.
+- `__or__`: A method for chaining formatters. It creates an instance of the provided class and extends the `formats` list with the current format's name and the current format's formats. It also extends the `messages_cols` list.
+
+Usage Example:
+
+```python
+from datasets import Dataset
+from my_module import BaseFormat
+
+# Create a dataset
+dataset = Dataset.from_pandas(pd.DataFrame({'col1': [1, 2, 3], 'col2': ['a', 'b', 'c']}))
+
+# Create a BaseFormat instance
+formatter = BaseFormat(dataset)
+
+# Format the dataset
+formatted_dataset = formatter.format()
+
+# Print the formatted dataset
+print(formatted_dataset)
+    ```
+"""
+
 from typing import Any
 from random import randint
 from abc import ABC, abstractmethod

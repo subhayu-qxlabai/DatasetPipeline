@@ -1,3 +1,43 @@
+"""
+The TextUtils module provides utility functions for working with text.
+
+Functions:
+- parse_to_dict(template: str, formatted_text: str) -> dict: Parses the input formatted text into a dictionary based on the given template.
+- replace_text(text: str, replacements: dict[str, Any], curly_braces: bool = True) -> str: Replaces text in a string based on the given replacements dictionary.
+- get_middle_text(text: str, begin: str, end: str, serializer: Callable[[str], Any] | None = None) -> str | None: Retrieves the text between the given begin and end strings in the input text.
+- get_replacement_keys(text: str) -> list[str]: Extracts all the keys that can be replaced in a string.
+
+Usage Example:
+
+```python
+from text_utils import TextUtils
+
+# Parse text to dictionary
+template = "Hello, {name}!"
+formatted_text = "Hello, John!"
+result = TextUtils.parse_to_dict(template, formatted_text)
+print(result)  # Output: {'name': 'John'}
+
+# Replace text
+text = "Hello, {name}!"
+replacements = {"name": "John"}
+result = TextUtils.replace_text(text, replacements, curly_braces=True)
+print(result)  # Output: Hello, John!
+
+# Get middle text
+input_text = "Hello, John!\nMy name is John!"
+begin = "Hello, "
+end = "!"
+result = TextUtils.get_middle_text(input_text, begin, end)
+print(result)  # Output: John
+
+# Get replacement keys
+text = "Hello, {name1}!\nMy name is {name2}!"
+result = TextUtils.get_replacement_keys(text)
+print(result)  # Output: ['name1', 'name2']
+```
+"""
+
 import re
 import json
 from typing import Any, Callable

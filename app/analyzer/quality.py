@@ -1,3 +1,24 @@
+"""
+This module provides a QualityAnalyzer class for analyzing the quality of text in a dataset.
+
+Classes:
+    QualityConfig: A class for configuring the QualityAnalyzer.
+    QualityAnalyzer: A class for analyzing the quality of text in a dataset.
+
+Exceptions:
+    ValueError: Raised when the response from the OpenAI API cannot be parsed into a TextQuality object.
+
+Example Usage:
+
+    from quality import QualityAnalyzer, QualityConfig
+
+    dataset = Dataset.from_csv('data.csv')
+    config = QualityConfig(column_name='text_column')
+    analyzer = QualityAnalyzer(dataset, config)
+    analyzed_dataset = analyzer.analyze()
+
+"""
+
 import json
 from warnings import warn
 

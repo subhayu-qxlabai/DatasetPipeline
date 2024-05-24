@@ -1,3 +1,43 @@
+"""
+This module provides a `Job` class for performing data processing jobs.
+
+The `Job` class takes a `JobConfig` object as input, which specifies the configuration for the job, including the data loading, formatting, deduplication, analysis, and saving steps.
+
+The `Job` class has the following methods:
+
+- `load()`: Loads the data using a `Loader` object based on the configuration in `JobConfig`.
+- `format()`: Formats the data using a `Format` object based on the configuration in `JobConfig`.
+- `analyze()`: Analyzes the data using an `Analyzer` object based on the configuration in `JobConfig`.
+- `dedup()`: Deduplicates the data using a `Dedup` object based on the configuration in `JobConfig`.
+- `save()`: Saves the data using a `Saver` object based on the configuration in `JobConfig`.
+- `_format_dedup_and_analyze()`: Applies the format, deduplication, and analysis steps to a dataset and returns the result.
+- `run()`: Runs the job by loading the data, applying the format, deduplication, and analysis steps, and saving the results if specified in the configuration.
+- `__call__()`: Calls the `run()` method to execute the job.
+
+The module also imports various modules and classes from other parts of the codebase, including `BaseModel` from `.models`, `Loader`, `LoaderConfig`, `Format`, `FormatConfig`, `Dedup`, `DedupConfig`, `Analyzer`, `AnalyzerConfig`, `Saver`, `SaverConfig`, `run_parallel_exec`, and `LOGGER` from `.helpers`.
+
+Example usage:
+
+```python
+from .job import Job, JobConfig
+
+# Create a JobConfig object with the desired configuration
+config = JobConfig(
+    load=LoaderConfig(...),
+    format=FormatConfig(...),
+    deduplicate=DedupConfig(...),
+    analyze=AnalyzerConfig(...),
+    save=SaverConfig(...)
+)
+
+# Create a Job object with the config
+job = Job(config)
+
+# Run the job
+results = job()
+```
+"""
+
 from pathlib import Path
 from itertools import chain
 from datasets import Dataset, DatasetDict

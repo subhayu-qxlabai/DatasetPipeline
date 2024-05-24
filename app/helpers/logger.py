@@ -8,6 +8,19 @@ def make_logger(
     min_level: Literal["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"] = "INFO",
     enable_backtrace: bool = True,
 ):
+    
+    """
+    Creates a logger with the specified configuration.
+    Args:
+        filename (str, optional): The name of the log file. Defaults to None.
+        min_level (Literal["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"], optional): The minimum log level. Defaults to "INFO".
+        enable_backtrace (bool, optional): Whether to enable backtrace. Defaults to True.
+    Returns:
+        logger: The logger object.
+    Example:
+        logger = make_logger(filename="my_log", min_level="DEBUG", enable_backtrace=False)
+    """
+
     if filename is None:
         out = sys.stdout
     else:

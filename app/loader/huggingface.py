@@ -1,3 +1,40 @@
+"""
+Module for loading datasets from the Hugging Face dataset repository.
+
+The module defines a configuration class `HFLoaderConfig` and a loader class `HFLoader`.
+
+The `HFLoaderConfig` class is a subclass of `BaseConfig` and defines the configuration options for loading datasets from Hugging Face. It has the following attributes:
+- `path`: Repository path to the dataset. Required.
+- `name`: Name of the dataset configuration. Defaults to `None`.
+- `token`: Hugging Face API token. Defaults to `None`.
+- `take_rows`: Number of rows to take from the dataset. Defaults to `None`.
+- `split`: Split to take from the dataset. Defaults to `None`.
+- `cache_dir`: Directory to cache the dataset. Defaults to `None`.
+
+The `HFLoader` class is a subclass of `BaseLoader` and is responsible for loading datasets from Hugging Face. It takes an instance of `HFLoaderConfig` as input in its constructor. The `load_or_download` method downloads the dataset from the specified repository path using the `load_dataset` function from the `datasets` library. The `_load` method further processes the loaded dataset by creating a dictionary mapping of dataset paths and splits, and returns a `DatasetDict` object containing the processed datasets.
+
+Usage example:
+```python
+from huggingface_loader import HFLoaderConfig, HFLoader
+
+# Create an instance of HFLoaderConfig with the desired configuration options
+config = HFLoaderConfig(
+    path="path/to/dataset",
+    name="dataset_name",
+    token="your_huggingface_api_token",
+    take_rows=100,
+    split="train",
+    cache_dir="path/to/cache_directory"
+)
+
+# Create an instance of HFLoader with the config
+loader = HFLoader(config)
+
+# Load the datasets
+datasets = loader.load()
+```
+"""
+
 from pydantic import Field
 from datasets import Dataset, DatasetDict, load_dataset
 
