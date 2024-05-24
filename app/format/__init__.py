@@ -32,7 +32,6 @@ The module provides the following classes:
 - `OutputFormat`: Converts a dataset into the specified output format.
 """
 
-from enum import Enum, auto
 from functools import partial
 from dataclasses import dataclass
 
@@ -48,34 +47,6 @@ from .dpo import DPOFormat, DPOConfig, DPOColumns
 from .to_text import ToTextFormat, ToTextConfig, RoleConfig
 from .output import OutputFormat, OutputConfig
 
-
-class ChatFormat(Enum):
-    ALPACA = auto()
-    CHATML = auto()
-    INST   = auto()
-
-def get_format(text_format: ChatFormat) -> ToTextConfig:
-    match text_format:
-        case ChatFormat.ALPACA:
-            return ToTextConfig(
-                system_key="### System: {system}",
-                user_template="### Instruction: {user}",
-                assistant_template="### Response: {assistant} <eos>",
-                separator="\n",
-            )
-        case ChatFormat.CHATML:
-            return ToTextConfig(
-                user_template="user\n{user}",
-                assistant_template="assistant\n{assistant}",
-                separator="\n\n",
-            )
-        case ChatFormat.INST:
-            return ToTextConfig(
-                system_template="<<SYS>> {system} <<SYS>>",
-                user_template="[INST] {user} [/INST]",
-                assistant_template="{assistant}",
-                separator=" ",
-            )
 
 class FormatConfig(BaseConfig):
     merger: MergerConfig | None = Field(default=MergerConfig(), description="Configuration for merging different columns into 'system', 'user' and 'assistant'")
@@ -113,7 +84,7 @@ class Format:
         return (
             self.merger(self.dataset)
             | self.sft
-            | self.conv_text # NOTE: This is an experimental format. Uncomment if you really need it
+            | self.conv_text
             | self.conv
             | self.dpo
         )
@@ -123,7 +94,7 @@ class Format:
         Standardizes the dataset by applying a series of data transformations.
 
         Params:
-            textualize (bool, optional): If True, the dataset is transformed into text format. Defaults to False.
+            textualize (bool, optional): If True, the messages in the dataset is transformed into text format. Defaults to False.
 
         Returns:
             Dataset: The analyzed dataset.

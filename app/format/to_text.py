@@ -11,10 +11,7 @@ from dedup.to_text import ToTextConfig, ToTextFormat
 dataset = Dataset.from_csv('data.csv')
 
 # Create a configuration object
-config = ToTextConfig(
-    column='conversation_column',
-    # Add any other configuration options here
-)
+config = ToTextConfig()
 
 # Create a ToTextFormat object
 formatter = ToTextFormat(dataset, config)

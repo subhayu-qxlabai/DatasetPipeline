@@ -84,6 +84,7 @@ class SFTConfig(BaseConfig):
 
 
 class SFTFormat(BaseFormat):
+    """SFTFormat is used to format a dataset into the standard format. It detects 'system', 'user', and 'assistant' columns in the dataset."""
     def __init__(self, dataset: Dataset, config: SFTConfig = SFTConfig()):
         super().__init__(dataset, config)
         self.config: SFTConfig

@@ -1,7 +1,7 @@
 """
-This module provides the `DPOFormat` class for handling datasets in the DPO (Dialogue Prompt Optimization) format.
+This module provides the `DPOFormat` class for handling datasets in the DPO format.
 
-The `DPOFormat` class is a subclass of `BaseFormat` and is designed to handle datasets in the DPO format. It provides methods for formatting the dataset by converting the columns into messages and adding them to the dataset.
+The `DPOFormat` class is a subclass of `BaseFormat` and is designed to handle datasets in the DPO format (with `chosen` and `rejected` columns). It provides methods for formatting the dataset by converting the columns into messages and adding them to the dataset.
 
 The class has the following main components:
 
@@ -80,6 +80,7 @@ class DPOConfig(BaseConfig):
 
 
 class DPOFormat(BaseFormat):
+    """The `DPOFormat` class is designed to handle datasets in the DPO format (with `chosen` and `rejected` columns). It provides methods for formatting the dataset by converting the columns into messages and adding them to the dataset."""
     def __init__(self, dataset: Dataset, config: DPOConfig = DPOConfig()):
         super().__init__(dataset, config)
         self.config: DPOConfig

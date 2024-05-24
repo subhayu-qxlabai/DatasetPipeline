@@ -48,7 +48,6 @@ class ConversationalTextFormat(BaseFormat):
     def __init__(self, dataset: Dataset, config: ConvTextConfig = ConvTextConfig()):
         super().__init__(dataset, config)
         self.config: ConvTextConfig
-        # warn(f"The {self.__class__.__name__!r} class is experimental, doesn't always work as expected and can be slow with about 10-20s of execution time.", UserWarning)
         self._is_this_format = False
 
     @property

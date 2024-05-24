@@ -23,6 +23,8 @@ from .format import (
     Role,
     DPOConfig,
     DPOColumns,
+    ConvConfig,
+    ConvTextConfig,
     ToTextConfig,
     RoleConfig,
     OutputConfig,
@@ -62,6 +64,8 @@ config = JobConfig(
                 "negative": DPOColumns.REJECTED,
             }
         ),
+        conv=ConvConfig(),
+        conv_text=ConvTextConfig(),
         to_text=ToTextConfig(
             system=RoleConfig(
                 template="SYSTEM: {system}",

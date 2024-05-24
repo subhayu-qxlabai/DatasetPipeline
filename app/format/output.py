@@ -27,6 +27,7 @@ class OutputConfig(BaseConfig):
     return_only_messages: bool = Field(default=False,description="Whether to only keep the 'messages' column. Defaults to 'False'")
 
 class OutputFormat(BaseFormat):
+    """The `OutputFormat` class is used to format a dataset according to the class `OutputConfig` configuration."""
     def __init__(self, dataset: Dataset, config: OutputConfig = OutputConfig()):
         super().__init__(dataset, config)
         self.config: OutputConfig
