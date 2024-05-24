@@ -255,8 +255,9 @@ class BaseModel(PydanticBaseModel):
             warnings=warnings,
             serialize_as_any=serialize_as_any,
         )
-        f = get_field_desc_map(self)
-        d = add_comments(d, f)
+        desc_key = "__desc__"
+        f = get_field_desc_map(self, desc_key=desc_key)
+        d = add_comments(d, f, desc_key=desc_key)
         buffer = StringIO()
         yaml.dump(d, buffer)
         return buffer.getvalue()

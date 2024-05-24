@@ -24,7 +24,7 @@ def get_format(text_format: ChatFormat) -> ToTextConfig:
     match text_format:
         case ChatFormat.ALPACA:
             return ToTextConfig(
-                # system_key="### System: {system}",
+                system_key="### System: {system}",
                 user_template="### Instruction: {user}",
                 assistant_template="### Response: {assistant} <eos>",
                 separator="\n",

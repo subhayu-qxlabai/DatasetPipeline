@@ -1,3 +1,5 @@
+"""Merges multiple columns of a dataset into a single columns for the system, user and assistant."""
+
 from typing import Any
 from datasets import Dataset
 

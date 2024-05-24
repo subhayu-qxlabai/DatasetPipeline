@@ -74,7 +74,7 @@ class ConversationalFormat(BaseFormat):
             )
             conv_roles = {user: Role.USER, assistant: Role.ASSISTANT}
         elif roles_df.columns.nunique() == 1:
-            # This is the only place where hardcoded values are used. Try to remove these constants
+            # TODO: This is the only place where hardcoded values are used. Try to remove these constants
             if roles_df[0].iloc[0] in ["system", "instruction", "instructions"]:
                 conv_roles = {roles_df[0].iloc[0]: Role.SYSTEM}
             conv_roles = {roles_df[0].iloc[0]: Role.USER}

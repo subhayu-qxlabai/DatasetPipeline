@@ -69,7 +69,7 @@ config = JobConfig(
     ),
     deduplicate=DedupConfig(
         semantic=SemanticDedupConfig(
-            threshold=0.2,
+            threshold=0.8,
         )
     ),
     analyze=AnalyzerConfig(

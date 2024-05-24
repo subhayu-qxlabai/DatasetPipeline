@@ -34,7 +34,7 @@ class SemanticDedup(BaseDedup):
                 show_progress=self.config.show_progress,
             ),
             use_cache=self.config.cache_embeddings
-        )
+        ) if self.config else None
 
     @cached_property
     def can_be_deduped(self):

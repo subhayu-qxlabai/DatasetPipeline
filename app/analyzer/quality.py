@@ -15,15 +15,20 @@ from ..helpers.call_openai import call_openai_api
 
 text_prefix = "Text to judge:\n"
 
+def make_categories(categories: list[str]): 
+    if not categories:
+        return ""
+    return f"--------------\n\nCategories: {', '.join(categories)}"
+
 TEXT_QUALITY_EXAMPLE_MESSAGES = Messages(
     messages=[
         Message(
             role=Role.SYSTEM.value,
-            content="You are a helpful assistant who can judge a content and give some metrics on it.\nHere are the metrics you need to give:\n        - the quality index (0-1)\n        - the reasoning of the quality (1-2 lines)\n        - ethical index (0-1)\n        - reason for the value in ethical. (1-2 lines)\n        - the category of the content\n        - language (use ISO code: en, hi, bn, es, it, ...)\n\nReturn in JSON format\n",
+            content="You are a helpful assistant who can judge a content and give some metrics on it.\nHere are the metrics you need to give:\n        - the quality index (0-1)\n        - the reasoning of the quality (1-2 lines)\n        - ethical index (0-1)\n        - reason for the value in ethical. (1-2 lines)\n        - the category of the content (pick from the categories, if given else make your own)\n        - language (use ISO code: en, hi, bn, es, it, ...)\n\nReturn in JSON format\n",
         ),
         Message(
             role=Role.USER.value,
-            content=f"{text_prefix}USER: My password of email account is 'abcde12345' .\nASSISTANT: okay its good but your password is not strong.",
+            content=f"{text_prefix}USER: My password of email account is 'abcde12345' .\nASSISTANT: okay its good but your password is not strong.{make_categories(['Security', 'Coding', 'Movies', 'Music'])}",
         ),
         Message(
             role=Role.ASSISTANT.value,
@@ -70,7 +75,7 @@ class QualityAnalyzer(BaseAnalyzer):
             messages=(self.config.example_messages or TEXT_QUALITY_EXAMPLE_MESSAGES).to_list()+[
                 {
                     "role": Role.USER.value,
-                    "content": text_prefix + text,
+                    "content": text_prefix + text + make_categories(self.config.categories),
                 }
             ],
             temperature=0,
@@ -93,5 +98,8 @@ class QualityAnalyzer(BaseAnalyzer):
             return self.dataset
         texts: set[str] = set(self.dataset[self.config.column_name])
         text_qualities: dict[str, TextQuality] = dict(run_parallel_exec(self.get_text_quality, texts))
-        text_qualities = {k: v.fix_category(self.config.categories) for k, v in text_qualities.items()}
+        
+        # NOTE - Fuzzy match categories and finds the best matching category. Not needed anymore
+        # text_qualities = {k: v.fix_category(self.config.categories) for k, v in text_qualities.items()}
+        
         return self.dataset.map(lambda x: text_qualities[x[self.config.column_name]].to_dict())
