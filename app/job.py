@@ -61,8 +61,25 @@ class JobConfig(BaseModel):
 
 
 class Job(BaseModel):
+    """
+    Represents a job in the pipeline.
+
+    Attributes:
+        config (JobConfig): The configuration for the job.
+
+    Methods:
+        load(self) -> Dataset: Loads the dataset using the specified loader.
+        format(self, dataset: Dataset, textualize: bool = False) -> Dataset: Formats the dataset using the specified format.
+        analyze(self, dataset: Dataset) -> Dataset: Analyzes the dataset using the specified analyzer.
+        dedup(self, dataset: Dataset) -> Dataset: Deduplicates the dataset using the specified deduplicator.
+        save(self, name_and_dataset: tuple[str, Dataset]) -> None: Saves the dataset using the specified saver.
+        _format_dedup_and_analyze(self, name_and_dataset: tuple[str, Dataset], textualize: bool = False) -> Dataset: Formats, deduplicates, and analyzes the dataset.
+        run(self) -> list[Path | Dataset]: Runs the job and returns the list of paths or datasets generated.
+        __call__(self) -> list[Path | Dataset]: Calls the `run` method.
+    """
     config: JobConfig
 
+    # ... rest of the code ...
     def load(self):
         loader = Loader(self.config.load)
         return loader.load()

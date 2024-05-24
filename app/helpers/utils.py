@@ -348,10 +348,10 @@ def add_comments(
     for key, value in data.items():
         full_key = f"{parent_key}.{key}" if parent_key else key
         subdesc = desc_map.get(key, {})
-        if "__desc__" in subdesc:
+        if desc_key in subdesc:
             indent = full_key.count(".") * indent_spaces
             commented_map.yaml_set_comment_before_after_key(
-                key, before=subdesc["__desc__"], indent=indent
+                key, before=subdesc[desc_key], indent=indent
             )
         if isinstance(value, dict):
             commented_map[key] = add_comments(

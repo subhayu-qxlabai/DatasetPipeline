@@ -68,7 +68,7 @@ PATTERN_ROLE_MAP = {
 }
 
 class SFTConfig(BaseConfig):
-    use_openai: bool = Field(default=False, description="Whether to use OpenAI to detect 'system', 'user' and 'assistant' columns. Defaults to 'false'")
+    use_openai: bool = Field(default=False, description="Whether to use OpenAI to detect 'system', 'user' and 'assistant' columns. **Experimental**. Defaults to 'false'")
     column_role_map: dict[str, Role|str] = Field(default=PATTERN_ROLE_MAP, description=f"Mapping between column names and role. Roles can be `user` and `assistant`, optionally `system`")
 
     @model_validator(mode="after")
@@ -136,7 +136,7 @@ class SFTFormat(BaseFormat):
                 MessageField.CONTENT.value: data[self.role_col_map[x]]
             } 
             for x in [Role.SYSTEM, Role.USER, Role.ASSISTANT] 
-            if x in self.role_col_map
+            if self.role_col_map.get(x)
         ]
 
     def _format(self) -> Dataset:

@@ -120,7 +120,6 @@ class BaseFormat(ABC):
         :return: A Dataset object representing the messages.
         :rtype: Dataset
         """
-        pass
     
     def format(self) -> Dataset:
         """

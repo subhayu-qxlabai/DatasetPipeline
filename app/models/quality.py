@@ -44,6 +44,7 @@ from .base import BaseModel
 from ..helpers.utils import find_best_match
 from pydantic import Field
 
+
 class TextQuality(BaseModel):
     quality_index: float=Field(description="Quality of the text")
     quality_reason: str=Field(description="Reason for the quality of the text")
