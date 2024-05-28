@@ -3,7 +3,7 @@ This module provides the main entry point for the deduplication functionality of
 
 It contains the main classes and functions for deduplication, including:
 
-- `BaseDedup` and `BaseConfig`: Base classes for deduplication functionality.
+- `BaseDedup` and `BaseDedupConfig`: Base classes for deduplication functionality.
 - `BaseModel`: Base class for deduplication models.
 - `SemanticDedup` and `SemanticDedupConfig`: Classes and configuration for semantic deduplication.
 - `Dedup` and `DedupConfig`: Class for deduplicating datasets and configuration.
@@ -16,7 +16,7 @@ from dataclasses import dataclass
 from datasets import Dataset, DatasetDict
 from pydantic import Field
 
-from .base import BaseDedup, BaseConfig, BaseModel
+from .base import BaseDedup, BaseDedupConfig, BaseModel
 from .semantic import SemanticDedup, SemanticDedupConfig
 
 

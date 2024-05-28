@@ -40,6 +40,7 @@ results = job()
 
 from pathlib import Path
 from itertools import chain
+from typing import ClassVar
 from datasets import Dataset, DatasetDict
 
 from .models import BaseModel
@@ -58,6 +59,8 @@ class JobConfig(BaseModel):
     deduplicate: DedupConfig | None = DedupConfig()
     analyze: AnalyzerConfig | None = AnalyzerConfig()
     save: SaverConfig | None = SaverConfig()
+    
+    sample: ClassVar["JobConfig"] = None
 
 
 class Job(BaseModel):

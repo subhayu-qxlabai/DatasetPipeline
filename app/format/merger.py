@@ -4,17 +4,17 @@ In this module it provides a class called MergerFormat which merges multiple col
 Usage example:
 ```
 dataset = Dataset(...)
-config = MergerConfig(...)
+config = MergerFormatConfig(...)
 merger_format = MergerFormat(dataset, config)
 merged_dataset = merger_format.format()
 ```
 
 Args:
     dataset (Dataset): The dataset to be merged.
-    config (MergerConfig, optional): The configuration for merging. Defaults to MergerConfig().
+    config (MergerFormatConfig, optional): The configuration for merging. Defaults to MergerFormatConfig().
 
 Attributes:
-    config (MergerConfig): The merged configuration.
+    config (MergerFormatConfig): The merged configuration.
 
 Methods:
     config_fields: Returns a set of field names to be merged.
@@ -29,17 +29,17 @@ Methods:
 from typing import Any
 from datasets import Dataset
 
-from .base import BaseFormat, BaseConfig
+from .base import BaseFormat, BaseFormatConfig
 from ..constants import MessageRole as Role
 from pydantic import Field
 
 
-class FieldConfig(BaseConfig):
+class FieldConfig(BaseFormatConfig):
     fields: list[str] | None = Field(default=None, description="List of column names to merge. Defaults to 'null'")
     separator: str = Field(default=" ", description="Seperator to merge the column. Defaults to ' '")
     merged_field: str | None = Field(default=None, description="Merged column name.")
 
-class MergerConfig(BaseConfig):
+class MergerFormatConfig(BaseFormatConfig):
     system: FieldConfig | None = FieldConfig(merged_field=Role.SYSTEM.value)
     user: FieldConfig | None = FieldConfig(merged_field=Role.USER.value)
     assistant: FieldConfig | None = FieldConfig(merged_field=Role.ASSISTANT.value)
@@ -48,9 +48,9 @@ class MergerConfig(BaseConfig):
 
 class MergerFormat(BaseFormat):
     """Merges multiple columns of a dataset into a single columns for the system, user and assistant."""
-    def __init__(self, dataset: Dataset, config: MergerConfig = MergerConfig()):
+    def __init__(self, dataset: Dataset, config: MergerFormatConfig = MergerFormatConfig()):
         super().__init__(dataset, config)
-        self.config: MergerConfig
+        self.config: MergerFormatConfig
 
     @property
     def config_fields(self) -> set[str]:

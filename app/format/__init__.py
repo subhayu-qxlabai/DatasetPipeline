@@ -38,24 +38,24 @@ from dataclasses import dataclass
 from datasets import Dataset
 from pydantic import Field
 
-from .base import BaseFormat, BaseConfig
-from .sft import SFTFormat, SFTConfig, Role
-from .merger import MergerFormat, MergerConfig, FieldConfig
-from .conv import ConversationalFormat, ConvConfig
-from .conv_text import ConversationalTextFormat, ConvTextConfig
-from .dpo import DPOFormat, DPOConfig, DPOColumns
-from .to_text import ToTextFormat, ToTextConfig, RoleConfig
-from .output import OutputFormat, OutputConfig
+from .base import BaseFormat, BaseFormatConfig
+from .sft import SFTFormat, SFTFormatConfig, Role
+from .merger import MergerFormat, MergerFormatConfig, FieldConfig
+from .conv import ConversationalFormat, ConversationalFormatConfig
+from .conv_text import ConversationalTextFormat, ConversationalTextFormatConfig
+from .dpo import DPOFormat, DPOFormatConfig, DPOColumns
+from .to_text import ToTextFormat, ToTextFormatConfig, RoleConfig
+from .output import OutputFormat, OutputFormatConfig
 
 
-class FormatConfig(BaseConfig):
-    merger: MergerConfig | None = Field(default=MergerConfig(), description="Configuration for merging different columns into 'system', 'user' and 'assistant'")
-    sft: SFTConfig | None = Field(default=SFTConfig(), description="Configuration for detecting 'system', 'user' and 'assistant' columns")
-    dpo: DPOConfig | None = Field(default=DPOConfig(), description="Configuration for detecting 'system', 'user', 'chosen' and 'rejected' columns")
-    conv: ConvConfig | None = Field(default=ConvConfig(), description="Configuration for detecting and converting conversational object formats. Columns having values like `list[dict[str, str]]`")
-    conv_text: ConvTextConfig | None = Field(default=None, description="Configuration for detecting and converting conversational text formats.")
-    to_text: ToTextConfig | None = Field(default=ToTextConfig(), description="Configuration for converting standardized messages to text format.")
-    output: OutputConfig | None = Field(default=OutputConfig(), description="Configuration for outputting the formatted dataset.")
+class FormatConfig(BaseFormatConfig):
+    merger: MergerFormatConfig | None = Field(default=MergerFormatConfig(), description="Configuration for merging different columns into 'system', 'user' and 'assistant'")
+    sft: SFTFormatConfig | None = Field(default=SFTFormatConfig(), description="Configuration for detecting 'system', 'user' and 'assistant' columns")
+    dpo: DPOFormatConfig | None = Field(default=DPOFormatConfig(), description="Configuration for detecting 'system', 'user', 'chosen' and 'rejected' columns")
+    conv: ConversationalFormatConfig | None = Field(default=ConversationalFormatConfig(), description="Configuration for detecting and converting conversational object formats. Columns having values like `list[dict[str, str]]`")
+    conv_text: ConversationalTextFormatConfig | None = Field(default=None, description="Configuration for detecting and converting conversational text formats.")
+    to_text: ToTextFormatConfig | None = Field(default=ToTextFormatConfig(), description="Configuration for converting standardized messages to text format.")
+    output: OutputFormatConfig | None = Field(default=OutputFormatConfig(), description="Configuration for outputting the formatted dataset.")
 
 
 @dataclass

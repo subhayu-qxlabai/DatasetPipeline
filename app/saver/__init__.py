@@ -12,7 +12,7 @@ from dataclasses import dataclass
 from datasets import Dataset
 from pydantic import Field
 
-from .base import BaseSaver, BaseConfig, BaseModel
+from .base import BaseSaver, BaseSaverConfig, BaseModel
 from .local import LocalSaver, LocalSaverConfig, LocalDirSaverConfig, FileType
 
 

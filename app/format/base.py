@@ -1,9 +1,9 @@
 """
-This module provides the `BaseConfig` and `BaseFormat` classes for formatting datasets.
+This module provides the `BaseFormatConfig` and `BaseFormat` classes for formatting datasets.
 
-`BaseConfig` is a subclass of `BaseModel` and serves as an empty configuration model.
+`BaseFormatConfig` is a subclass of `BaseModel` and serves as an empty configuration model.
 
-`BaseFormat` is an abstract base class for formatting datasets. It has an initializer that takes a `Dataset` object and an optional `BaseConfig` object. It also has several properties and methods:
+`BaseFormat` is an abstract base class for formatting datasets. It has an initializer that takes a `Dataset` object and an optional `BaseFormatConfig` object. It also has several properties and methods:
 
 - `has_config`: A boolean property indicating whether the format has a config.
 - `format_class`: A property returning the class of the format.
@@ -45,17 +45,17 @@ import pandas as pd
 from ..models.base import BaseModel
 from ..helpers.types import is_conv_type, is_standard_type
 
-class BaseConfig(BaseModel):
+class BaseFormatConfig(BaseModel):
     pass
 
 class BaseFormat(ABC):
-    def __init__(self, dataset: Dataset, config = BaseConfig()):
+    def __init__(self, dataset: Dataset, config = BaseFormatConfig()):
         """
-        Initializes the BaseFormat object with the given dataset.
+        Initializes the Format object with the given dataset.
 
         Parameters:
             dataset (Dataset): The dataset to be used for initialization.
-            config (BaseConfig): The config to be used for initialization. Defaults to BaseConfig().
+            config (BaseFormatConfig): The config to be used for initialization.
 
         Returns:
             None

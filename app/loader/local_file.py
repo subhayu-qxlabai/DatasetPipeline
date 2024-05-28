@@ -34,7 +34,7 @@ from pathlib import Path
 from datasets import Dataset, DatasetDict
 from pydantic import Field, model_validator
 
-from .base import BaseLoader, BaseConfig
+from .base import BaseLoader, BaseLoaderConfig
 
 
 class FileType(str, Enum):
@@ -43,7 +43,7 @@ class FileType(str, Enum):
     PARQUET = "parquet"
 
 
-class LocalFileLoaderConfig(BaseConfig):
+class LocalFileLoaderConfig(BaseLoaderConfig):
     path: str | Path = Field(description="Path to the file. Must be one of: `csv`, `json`, `parquet`")
     take_rows: int | None = Field(default=None, description="Number of rows to take from the file.")
     

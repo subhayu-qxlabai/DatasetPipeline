@@ -2,11 +2,11 @@
 This module provides the base classes and functions for analyzing datasets.
 
 Classes:
-    BaseConfig: The base configuration class for analyzers.
+    BaseAnalyzerConfig: The base configuration class for analyzers.
     BaseAnalyzer: The base analyzer class that defines the interface for dataset analyzers.
 
 Methods:
-    __init__(self, dataset: Dataset, config=BaseConfig()):
+    __init__(self, dataset: Dataset, config=BaseAnalyzerConfig()):
         Initializes the BaseAnalyzer object with the given dataset and configuration.
 
     has_config(self) -> bool:
@@ -26,9 +26,9 @@ Methods:
 
 Example Usage:
     from datasets import Dataset
-    from .base import BaseAnalyzer, BaseConfig
+    from .base import BaseAnalyzer, BaseAnalyzerConfig
 
-    class MyConfig(BaseConfig):
+    class MyConfig(BaseAnalyzerConfig):
         pass
         
     class MyAnalyzer(BaseAnalyzer):
@@ -50,17 +50,17 @@ from datasets import Dataset
 from ..models.base import BaseModel
 
 
-class BaseConfig(BaseModel):
+class BaseAnalyzerConfig(BaseModel):
     pass
 
 class BaseAnalyzer(ABC):
-    def __init__(self, dataset: Dataset, config = BaseConfig()):
+    def __init__(self, dataset: Dataset, config = BaseAnalyzerConfig()):
         """
         Initializes the BaseAnalyzer object with the given dataset.
 
         Parameters:
             dataset (Dataset): The dataset to be used for initialization.
-            config (BaseConfig): The config of the analyzer.
+            config (BaseAnalyzerConfig): The config of the analyzer.
 
         Returns:
             None

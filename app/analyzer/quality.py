@@ -26,7 +26,7 @@ from retry import retry
 from datasets import Dataset
 from pydantic import model_validator, Field
 
-from .base import BaseAnalyzer, BaseConfig
+from .base import BaseAnalyzer, BaseAnalyzerConfig
 from ..constants import MessageRole as Role
 from ..models.quality import TextQuality
 from ..models.messages import Message, Messages
@@ -65,7 +65,7 @@ TEXT_QUALITY_EXAMPLE_MESSAGES = Messages(
     ]
 )
 
-class QualityConfig(BaseConfig):
+class QualityAnalyzerConfig(BaseAnalyzerConfig):
     column_name: str = Field(default="messages", description="Name of the column to check the quality. Defaults to 'messages'")
     categories: list[str] | None = Field(default=None, description="List of categories to use. Defaults to 'null'")
     example_messages: Messages = Field(default=TEXT_QUALITY_EXAMPLE_MESSAGES, description=f"Example messages to send to OpenAI.")
@@ -86,9 +86,9 @@ class QualityConfig(BaseConfig):
         return self
 
 class QualityAnalyzer(BaseAnalyzer):
-    def __init__(self, dataset: Dataset, config: QualityConfig = QualityConfig()):
+    def __init__(self, dataset: Dataset, config: QualityAnalyzerConfig = QualityAnalyzerConfig()):
         super().__init__(dataset, config)
-        self.config: QualityConfig
+        self.config: QualityAnalyzerConfig
     
     @retry(json.JSONDecodeError, tries=3, delay=3)
     def get_text_quality(self, text: str):

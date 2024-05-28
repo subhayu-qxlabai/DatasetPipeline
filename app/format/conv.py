@@ -3,7 +3,7 @@ Converts conversational data to the standard format.
 
 This module provides functionality for converting one or multiple columns of conversational data to the standard format, irrespective of the current format. It defines the `ConvConfig` class and the `ConversationalFormat` class.
 
-The `ConvConfig` class is a subclass of `BaseConfig` and currently does not have any additional functionality.
+The `ConvConfig` class is a subclass of `BaseFormatConfig` and currently does not have any additional functionality.
 
 The `ConversationalFormat` class is responsible for converting the conversational data. It takes a `Dataset` object and a `ConvConfig` object as input. It initializes the `BaseFormat` class with the given dataset and config. It also has a `conv_props` attribute that stores a list of `ConvProps` objects.
 
@@ -46,20 +46,26 @@ from datasets import Dataset
 
 from ..helpers import safe_getitem
 from ..models.conv import ConvProps
-from .base import BaseFormat, BaseConfig
+from .base import BaseFormat, BaseFormatConfig
 from ..constants import MessageRole as Role
 
 
-class ConvConfig(BaseConfig):
+class ConversationalFormatConfig(BaseFormatConfig):
     pass
+
 
 class ConversationalFormat(BaseFormat):
     """Converts one or multiple columns of conversational data to the standard format, irrespective of the current format"""
-    def __init__(self, dataset: Dataset, config: ConvConfig = ConvConfig()):
+
+    def __init__(
+        self,
+        dataset: Dataset,
+        config: ConversationalFormatConfig = ConversationalFormatConfig(),
+    ):
         super().__init__(dataset, config)
-        self.config: ConvConfig
+        self.config: ConversationalFormatConfig
         self.conv_props = self.get_conv_props()
-        
+
     def get_conv_props(self) -> list[ConvProps]:
         conv_props = [ConvProps(column=column) for column in self.get_conv_columns()]
         conv_props = [self._get_conv_prop(conv_prop) for conv_prop in conv_props]
@@ -73,22 +79,30 @@ class ConversationalFormat(BaseFormat):
             conv_prop.has_system = conv_df[role_key].nunique() == 3
             conv_prop.roles_map = self._get_conv_roles(conv_prop)
         return conv_prop
-    
+
     def _get_role_and_content_key(self, conv_df: pd.DataFrame) -> tuple[str, str]:
         if conv_df.empty or len(conv_df) < 6:
             warn("Not enough messages to determine role and content keys", UserWarning)
         role_key: str = safe_getitem(
             [col for col in conv_df.columns if conv_df[col].nunique() in [1, 2, 3]]
         )
-        content_key: str = safe_getitem(
-            conv_df.drop(role_key, axis=1).nunique().sort_values().reset_index()["index"], -1
-        ) if role_key is not None else None
+        content_key: str = (
+            safe_getitem(
+                conv_df.drop(role_key, axis=1)
+                .nunique()
+                .sort_values()
+                .reset_index()["index"],
+                -1,
+            )
+            if role_key is not None
+            else None
+        )
         return role_key, content_key
-    
+
     def _get_conv_roles(self, conv_prop: ConvProps) -> dict[str, Role]:
         if conv_prop.column is None:
             return {}
-        
+
         roles_df = pd.DataFrame(self.dataset[conv_prop.column])
         roles_df = roles_df.map(lambda x: (x or {}).get(conv_prop.role_key))
         if conv_prop.has_system and roles_df.columns.nunique() >= 3:
@@ -102,7 +116,11 @@ class ConversationalFormat(BaseFormat):
                 .iloc[-1]
                 .tolist()[:3]
             )
-            conv_roles = {system: Role.SYSTEM, user: Role.USER, assistant: Role.ASSISTANT}
+            conv_roles = {
+                system: Role.SYSTEM,
+                user: Role.USER,
+                assistant: Role.ASSISTANT,
+            }
         elif roles_df.columns.nunique() == 2:
             user, assistant = (
                 roles_df[[0, 1]]
@@ -138,5 +156,7 @@ class ConversationalFormat(BaseFormat):
                     )
                 }
             )
-        self.messages_cols += [(single_col or conv_prop.column) for conv_prop in self.conv_props]
+        self.messages_cols += [
+            (single_col or conv_prop.column) for conv_prop in self.conv_props
+        ]
         return dataset

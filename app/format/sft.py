@@ -17,13 +17,13 @@ Functions:
 
 ```python
 from datasets import Dataset
-from sft import SFTFormat, SFTConfig
+from sft import SFTFormat, SFTFormatConfig
 
 # Create a dataset
 dataset = Dataset(...)
 
 # Create an instance of SFTFormat
-config = SFTConfig(...)
+config = SFTFormatConfig(...)
 sft_format = SFTFormat(dataset, config)
 
 # Format a dataset
@@ -35,7 +35,7 @@ import json
 from datasets import Dataset
 from pydantic import model_validator,Field
 
-from .base import BaseFormat, BaseConfig
+from .base import BaseFormat, BaseFormatConfig
 from ..helpers.regex_dict import RegexDict
 from ..helpers.call_openai import call_openai_api
 from ..constants import MessageRole as Role, MessageField
@@ -67,7 +67,7 @@ PATTERN_ROLE_MAP = {
     "input.*": Role.SYSTEM,
 }
 
-class SFTConfig(BaseConfig):
+class SFTFormatConfig(BaseFormatConfig):
     use_openai: bool = Field(default=False, description="Whether to use OpenAI to detect 'system', 'user' and 'assistant' columns. **Experimental**. Defaults to 'false'")
     column_role_map: dict[str, Role|str] = Field(default=PATTERN_ROLE_MAP, description=f"Mapping between column names and role. Roles can be `user` and `assistant`, optionally `system`")
 
@@ -85,16 +85,16 @@ class SFTConfig(BaseConfig):
 
 class SFTFormat(BaseFormat):
     """SFTFormat is used to format a dataset into the standard format. It detects 'system', 'user', and 'assistant' columns in the dataset."""
-    def __init__(self, dataset: Dataset, config: SFTConfig = SFTConfig()):
+    def __init__(self, dataset: Dataset, config: SFTFormatConfig = SFTFormatConfig()):
         super().__init__(dataset, config)
-        self.config: SFTConfig
+        self.config: SFTFormatConfig
         self.pattern_role_map = RegexDict(self.config.column_role_map)
         self.role_col_map = self._get_role_col_map()
     
     def _get_role_col_map(self) -> dict[Role, str]:
         data = self.dict_repr
         if not self.config.use_openai:
-            role_col = []
+            role_col: list[tuple[Role, str]] = []
             p_r_map: dict[str, Role] = self.pattern_role_map
             for col in list(data):
                 key = p_r_map.get(col)

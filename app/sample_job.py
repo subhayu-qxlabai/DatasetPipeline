@@ -17,19 +17,19 @@ from .job import Job, JobConfig
 from .loader import LoaderConfig, HFLoaderConfig
 from .format import (
     FormatConfig,
-    MergerConfig,
+    MergerFormatConfig,
     FieldConfig,
-    SFTConfig,
+    SFTFormatConfig,
     Role,
-    DPOConfig,
+    DPOFormatConfig,
     DPOColumns,
-    ConvConfig,
-    ConvTextConfig,
-    ToTextConfig,
+    ConversationalFormatConfig,
+    ConversationalTextFormatConfig,
+    ToTextFormatConfig,
     RoleConfig,
-    OutputConfig,
+    OutputFormatConfig,
 )
-from .analyzer import AnalyzerConfig, QualityConfig
+from .analyzer import AnalyzerConfig, QualityAnalyzerConfig
 from .dedup import DedupConfig, SemanticDedupConfig
 from .saver import SaverConfig, LocalSaverConfig, FileType
 
@@ -41,14 +41,14 @@ config = JobConfig(
         )
     ),
     format=FormatConfig(
-        merger=MergerConfig(
+        merger=MergerFormatConfig(
             user=FieldConfig(
                 fields=["book_id", "author", "text"],
                 separator="\n",
                 merged_field="human",
             ),
         ),
-        sft=SFTConfig(
+        sft=SFTFormatConfig(
             use_openai=False,
             column_role_map={
                 "persona": Role.SYSTEM,
@@ -56,7 +56,7 @@ config = JobConfig(
                 "summary": Role.ASSISTANT,
             },
         ),
-        dpo=DPOConfig(
+        dpo=DPOFormatConfig(
             column_role_map={
                 "human": "user",  # we can pass string
                 "persona": DPOColumns.SYSTEM,  # or DPOColumns
@@ -64,9 +64,9 @@ config = JobConfig(
                 "negative": DPOColumns.REJECTED,
             }
         ),
-        conv=ConvConfig(),
-        conv_text=ConvTextConfig(),
-        to_text=ToTextConfig(
+        conv=ConversationalFormatConfig(),
+        conv_text=ConversationalTextFormatConfig(),
+        to_text=ToTextFormatConfig(
             system=RoleConfig(
                 template="SYSTEM: {system}",
                 key="system",
@@ -81,7 +81,7 @@ config = JobConfig(
             ),
             separator="\n\n",
         ),
-        output=OutputConfig(
+        output=OutputFormatConfig(
             return_only_messages=True,
         ),
     ),
@@ -91,7 +91,7 @@ config = JobConfig(
         )
     ),
     analyze=AnalyzerConfig(
-        quality=QualityConfig(
+        quality=QualityAnalyzerConfig(
             column_name="messages",
             categories=[
                 "code",

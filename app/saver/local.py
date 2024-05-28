@@ -5,9 +5,10 @@ from warnings import warn
 from datasets import Dataset
 from pydantic import model_validator, field_validator, computed_field,Field
 
-from .base import BaseSaver, BaseConfig
+from .base import BaseSaver, BaseSaverConfig
 from ..helpers.utils import get_ts_filename
 from ..helpers import LOGGER
+
 
 class FileType(str, Enum):
     CSV = "csv"
@@ -15,7 +16,7 @@ class FileType(str, Enum):
     PARQUET = "parquet"
 
 
-class LocalDirSaverConfig(BaseConfig):
+class LocalDirSaverConfig(BaseSaverConfig):
     directory: Path | str = Field(default="processed",description="Directory path to save the dataset. Defaults to 'processed'")
     filetype: FileType | str | None = Field(default=FileType.PARQUET,description=f"Filetype to save the dataset. Can be one of '{FileType.CSV}', '{FileType.JSON}' or '{FileType.PARQUET}'. Defaults to '{FileType.PARQUET}'")
 

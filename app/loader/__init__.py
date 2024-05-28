@@ -17,7 +17,7 @@ from dataclasses import dataclass
 from datasets import Dataset, DatasetDict
 from pydantic import Field, model_validator
 
-from .base import BaseLoader, BaseConfig, BaseModel
+from .base import BaseLoader, BaseLoaderConfig, BaseModel
 from .huggingface import HFLoader, HFLoaderConfig
 from .local_file import LocalFileLoader, LocalFileLoaderConfig
 

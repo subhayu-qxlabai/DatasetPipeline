@@ -19,13 +19,13 @@ from dataclasses import dataclass
 from datasets import Dataset
 from pydantic import Field
 
-from .base import BaseAnalyzer, BaseConfig, BaseModel
-from .quality import QualityAnalyzer, QualityConfig, Message, Messages, TEXT_QUALITY_EXAMPLE_MESSAGES
-from .output import OutputAnalyzer
+from .base import BaseAnalyzer, BaseAnalyzerConfig, BaseModel
+from .quality import QualityAnalyzer, QualityAnalyzerConfig, Message, Messages, TEXT_QUALITY_EXAMPLE_MESSAGES
+from .output import OutputAnalyzer, OutputAnalyzerConfig
 
 
 class AnalyzerConfig(BaseModel):
-    quality: QualityConfig | None = Field(default=QualityConfig(), description="Configuration for qualitative analysis.")
+    quality: QualityAnalyzerConfig | None = Field(default=QualityAnalyzerConfig(), description="Configuration for qualitative analysis.")
     
 
 @dataclass

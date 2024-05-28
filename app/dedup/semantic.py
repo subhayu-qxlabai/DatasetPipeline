@@ -39,13 +39,13 @@ from langchain_community.vectorstores import FAISS
 from datasets import Dataset, DatasetDict
 from langchain_community.embeddings.huggingface import HuggingFaceEmbeddings
 
-from .base import BaseConfig, BaseDedup
+from .base import BaseDedupConfig, BaseDedup
 from ..helpers.utils import hash_uuid
 from ..helpers.embeddings import Embeddings
 from pydantic import Field
 
 
-class SemanticDedupConfig(BaseConfig):
+class SemanticDedupConfig(BaseDedupConfig):
     column: str = Field(default="messages",description="Name of the column to deduplicate. Defaults to 'messages'")
     threshold: float = Field(default=0.8,description="Minimum threshold to consider two messages similar. Defaults to '0.8'")
     cache_embeddings: bool = Field(default=False,description="Whether to cache the embeddings. Defaults to 'false'")

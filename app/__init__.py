@@ -25,19 +25,19 @@ A data processing and analysis pipeline designed to handle various jobs related 
 - `Format`: Main class for formatting datasets.
 - `FormatConfig`: Represents the configuration for a format.
 - `MergerFormat`: A specific type of format that merges multiple data formats.
-- `MergerConfig`: Represents the configuration for a MergerFormat.
+- `MergerFormatConfig`: Represents the configuration for a MergerFormat.
 - `FieldConfig`: Represents the configuration for a field in a format.
 - `SFTFormat`: A specific type of format that performs semantic field transformation.
-- `SFTConfig`: Represents the configuration for an SFTFormat.
+- `SFTFormatConfig`: Represents the configuration for an SFTFormat.
 - `Role`: Represents a role enumeration in a data format.
 - `DPOFormat`: A specific type of format that performs deduplication and projection.
-- `DPOConfig`: Represents the configuration for a DPOFormat.
+- `DPOFormatConfig`: Represents the configuration for a DPOFormat.
 - `DPOColumns`: Represents the columns in a DPO format.
 - `ToTextFormat`: A specific type of format that converts data to text format.
-- `ToTextConfig`: Represents the configuration for a ToTextFormat.
+- `ToTextFormatConfig`: Represents the configuration for a ToTextFormat.
 - `RoleConfig`: Represents the configuration for a role in a format.
 - `OutputFormat`: A specific type of format that saves data to an output location.
-- `OutputConfig`: Represents the configuration for an OutputFormat.
+- `OutputFormatConfig`: Represents the configuration for an OutputFormat.
 
 ---
 ## Deduplication Engines
@@ -89,17 +89,17 @@ from .format import (
     Format,
     FormatConfig,
     MergerFormat,
-    MergerConfig,
+    MergerFormatConfig,
     FieldConfig,
     SFTFormat,
-    SFTConfig,
+    SFTFormatConfig,
     DPOFormat,
-    DPOConfig,
+    DPOFormatConfig,
     ToTextFormat,
-    ToTextConfig,
+    ToTextFormatConfig,
     RoleConfig,
     OutputFormat,
-    OutputConfig,
+    OutputFormatConfig,
 )
 from .dedup import (
     Dedup,
@@ -111,7 +111,7 @@ from .analyzer import (
     Analyzer,
     AnalyzerConfig,
     QualityAnalyzer,
-    QualityConfig,
+    QualityAnalyzerConfig,
     TEXT_QUALITY_EXAMPLE_MESSAGES,
 )
 from .saver import (
@@ -122,6 +122,9 @@ from .saver import (
     LocalDirSaverConfig,
     FileType,
 )
+from .sample_job import config as sample_job_config
+
+JobConfig.sample = sample_job_config
 
 __all__ = [
     "Pipeline",
@@ -138,19 +141,19 @@ __all__ = [
     "Format",
     "FormatConfig",
     "MergerFormat",
-    "MergerConfig",
+    "MergerFormatConfig",
     "FieldConfig",
     "SFTFormat",
-    "SFTConfig",
+    "SFTFormatConfig",
     "Role",
     "DPOFormat",
-    "DPOConfig",
+    "DPOFormatConfig",
     "DPOColumns",
     "ToTextFormat",
-    "ToTextConfig",
+    "ToTextFormatConfig",
     "RoleConfig",
     "OutputFormat",
-    "OutputConfig",
+    "OutputFormatConfig",
     
     "Dedup",
     "DedupConfig",
@@ -160,7 +163,7 @@ __all__ = [
     "Analyzer",
     "AnalyzerConfig",
     "QualityAnalyzer",
-    "QualityConfig",
+    "QualityAnalyzerConfig",
     "TEXT_QUALITY_EXAMPLE_MESSAGES",
     
     "Saver",

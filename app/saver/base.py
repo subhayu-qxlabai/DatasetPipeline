@@ -5,17 +5,17 @@ from datasets import Dataset
 from ..models.base import BaseModel
 
 
-class BaseConfig(BaseModel):
+class BaseSaverConfig(BaseModel):
     pass
 
 class BaseSaver(ABC):
-    def __init__(self, dataset: Dataset, config: BaseConfig):
+    def __init__(self, dataset: Dataset, config: BaseSaverConfig):
         """
         Initializes the BaseSaver object with the given dataset.
 
         Parameters:
             dataset (Dataset): The dataset to save.
-            config (BaseConfig): The config of the saver.
+            config (BaseSaverConfig): The config of the saver.
 
         Returns:
             None
